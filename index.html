@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MixQZero AI Chat | Beta</title>
     
-    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap)" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- ПОДКЛЮЧАЕМ СТИЛИ ДЛЯ ПОДСВЕТКИ КОДА (Тема VS Code / Atom Dark) -->
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css](https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 
     <!-- ПОДКЛЮЧАЕМ СКРИПТЫ ДЛЯ МАРКДАУНА И ПОДСВЕТКИ -->
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js](https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js](https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js)"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <style>
         /* ЦВЕТОВЫЕ ПАЛИТРЫ (ТЕМЫ) */
@@ -288,7 +288,7 @@
             align-self: flex-end;
             border-bottom-right-radius: 4px;
             box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
-            white-space: pre-wrap; /* Пользовательский ввод оставляем простым текстом */
+            white-space: pre-wrap;
         }
 
         .ai-message {
@@ -584,8 +584,8 @@
                 </select>
             </div>
             <div class="settings-links">
-                <a href="[https://t.me/mixqzero](https://t.me/mixqzero)" target="_blank" class="settings-link-btn" id="linkTg">Телеграмм канал</a>
-                <a href="[https://mixqzero.github.io/main](https://mixqzero.github.io/main)" target="_blank" class="settings-link-btn" id="linkMain">Основной сайт</a>
+                <a href="https://t.me/mixqzero" target="_blank" class="settings-link-btn" id="linkTg">Телеграмм канал</a>
+                <a href="https://mixqzero.github.io/main" target="_blank" class="settings-link-btn" id="linkMain">Основной сайт</a>
             </div>
             <div class="modal-footer-status">
                 <span id="statusLabel">Status:</span> <span class="status-online">Online</span>
@@ -594,25 +594,6 @@
     </div>
 
     <script>
-        // НАСТРОЙКА КАЗСТОМНОГО ПАРСЕРА ДЛЯ БЛОКОВ КОДА
-        const renderer = new marked.Renderer();
-        renderer.code = function(code, infostring) {
-            const lang = infostring || 'text';
-            // Защищаем спец-символы HTML
-            const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            
-            return `
-                <div class="code-container">
-                    <div class="code-header">
-                        <span>${lang}</span>
-                        <button class="copy-code-btn" onclick="copyCodeText(this)">Copy</button>
-                    </div>
-                    <pre><code class="hljs language-${lang}">${escapedCode}</code></pre>
-                </div>
-            `;
-        };
-        marked.setOptions({ renderer: renderer });
-
         const chatForm = document.getElementById('chatForm');
         const userInput = document.getElementById('userInput');
         const messagesContainer = document.getElementById('messagesContainer');
@@ -621,7 +602,7 @@
         const chatsList = document.getElementById('chatsList');
         const modal = document.getElementById('settingsModalOverlay');
 
-        const WORKER_URL = '[https://webai.mqz.workers.dev/](https://webai.mqz.workers.dev/)'; 
+        const WORKER_URL = 'https://webai.mqz.workers.dev/'; 
 
         let allChats = {}; 
         let currentChatId = null;
@@ -661,6 +642,25 @@
             }
         };
 
+        // НАСТРОЙКА КАЗСТОМНОГО ПАРСЕРА ДЛЯ БЛОКОВ КОДА
+        const renderer = {
+            code(code, infostring) {
+                const lang = infostring || 'text';
+                const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                return `
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>${lang}</span>
+                            <button class="copy-code-btn" onclick="copyCodeText(this)">Copy</button>
+                        </div>
+                        <pre><code class="hljs language-${lang}">${escapedCode}</code></pre>
+                    </div>
+                `;
+            }
+        };
+        marked.use({ renderer });
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedAllChats = localStorage.getItem('mixqzero_all_chats');
             const savedCurrentId = localStorage.getItem('mixqzero_current_chat_id');
@@ -668,10 +668,13 @@
             
             if (savedCurrentId && allChats[savedCurrentId]) {
                 currentChatId = savedCurrentId;
-                renderMessages();
             } else {
-                startNewChat();
+                currentChatId = 'chat_' + Date.now();
+                allChats[currentChatId] = { title: currentLang === 'ru' ? 'Новый чат' : 'New Chat', history: [] };
+                saveToLocalStorage();
             }
+            
+            renderMessages();
             renderSidebarChats();
 
             const savedTheme = localStorage.getItem('mixqzero_theme') || 'dark';
@@ -724,7 +727,7 @@
             document.getElementById('linkMain').textContent = t.mainSite;
             document.getElementById('serverTariffLabel').textContent = t.tariff;
             
-            if (allChats[currentChatId].history.length === 0) {
+            if (allChats[currentChatId] && allChats[currentChatId].history.length === 0) {
                 messagesContainer.innerHTML = '';
                 appendMessage(t.greeting, 'ai-message', false);
             }
@@ -773,6 +776,8 @@
 
         function renderMessages() {
             messagesContainer.innerHTML = '';
+            if (!allChats[currentChatId]) return;
+            
             const history = allChats[currentChatId].history;
             if (history.length === 0) {
                 appendMessage(translations[currentLang].greeting, 'ai-message', false);
@@ -843,7 +848,7 @@
 
             } catch (error) {
                 console.error(error);
-                loadingElement.remove();
+                if (loadingElement) loadingElement.remove();
                 appendMessage(translations[currentLang].errorNet, 'ai-message', false);
             } finally {
                 userInput.disabled = false;
@@ -857,20 +862,12 @@
             messageDiv.classList.add('message', className);
             messagesContainer.appendChild(messageDiv);
             
-            if (className === 'ai-message' && isAiReply) {
-                // Если это новый ответ от ИИ, рендерим через Marked + подсвечиваем код
-                messageDiv.innerHTML = marked.parse(content);
-                messageDiv.querySelectorAll('pre code').forEach((el) => {
-                    hljs.highlightElement(el);
-                });
-            } else if (className === 'ai-message' && !isAiReply) {
-                // Если это история из локалсторейджа или системное сообщение
+            if (className === 'ai-message') {
                 messageDiv.innerHTML = marked.parse(content);
                 messageDiv.querySelectorAll('pre code').forEach((el) => {
                     hljs.highlightElement(el);
                 });
             } else {
-                // Сообщение пользователя выводим текстом (безопасность от XSS)
                 messageDiv.textContent = content;
             }
             
@@ -878,7 +875,6 @@
             return messageDiv;
         }
 
-        // ФУНКЦИЯ КОПИРОВАНИЯ КОДА В БУФЕР ОБМЕНА
         function copyCodeText(button) {
             const codeContainer = button.closest('.code-container');
             const codeElement = codeContainer.querySelector('code');
