@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MixQZero AI Chat</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,7 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            height: 100vh;
+            height: 100dvh; /* Динамическая высота подстраивается под мобильные панели браузеров */
             display: flex;
             overflow: hidden;
         }
@@ -260,9 +260,11 @@
         .loading-dots span:nth-child(2) { animation-delay: .2s; }
         .loading-dots span:nth-child(3) { animation-delay: .4s; }
 
+        /* Область ввода с защитой от перекрытия панелями навигации */
         .chat-input-area {
-            padding: 20px 30px 30px 30px;
+            padding: 15px 30px 25px 30px; 
             background: linear-gradient(transparent, var(--chat-bg) 30%);
+            flex-shrink: 0; 
         }
 
         .input-wrapper {
@@ -359,8 +361,9 @@
                 font-size: 14px;
             }
 
+            /* Специальный отступ для инпута на смартфонах, чтобы приподнять его над строкой Яндекса/Safari */
             .chat-input-area {
-                padding: 10px 20px 20px 20px;
+                padding: 10px 15px 25px 15px; 
             }
         }
 
@@ -433,7 +436,6 @@
 
         const WORKER_URL = 'https://webai.mqz.workers.dev/'; 
 
-        // Глобальная структура данных для мульти-чатов
         let allChats = {}; 
         let currentChatId = null;
         const MAX_HISTORY = 16; 
@@ -481,7 +483,6 @@
         function renderSidebarChats() {
             chatsList.innerHTML = '';
             
-            // Сортируем от новых к старым
             const sortedIds = Object.keys(allChats).sort((a, b) => b.split('_')[1] - a.split('_')[1]);
             
             sortedIds.forEach(id => {
@@ -495,12 +496,11 @@
                 titleSpan.style.textOverflow = 'ellipsis';
                 item.appendChild(titleSpan);
                 
-                // Кнопка удаления чата
                 const delBtn = document.createElement('button');
                 delBtn.classList.add('delete-chat-btn');
                 delBtn.innerHTML = '✕';
                 delBtn.onclick = (e) => {
-                    e.stopPropagation(); // Чтобы не активировался клик по чату
+                    e.stopPropagation(); 
                     deleteChat(id);
                 };
                 item.appendChild(delBtn);
@@ -511,7 +511,7 @@
                     renderMessages();
                     renderSidebarChats();
                     if (window.innerWidth <= 768) {
-                        toggleSidebar(); // Закрываем меню на мобилках при выборе
+                        toggleSidebar(); 
                     }
                 };
                 
@@ -561,7 +561,6 @@
             userInput.disabled = true;
             sendBtn.disabled = true;
 
-            // Если это первое сообщение — переименовываем чат по тексту вопроса
             if (allChats[currentChatId].history.length === 0) {
                 allChats[currentChatId].title = text.length > 22 ? text.substring(0, 20) + '...' : text;
                 renderSidebarChats();
