@@ -42,8 +42,10 @@
             display: flex;
             width: 100%;
             height: 100%;
+            position: relative;
         }
 
+        /* Боковая панель */
         .sidebar {
             width: 260px;
             background-color: var(--sidebar-bg);
@@ -51,13 +53,15 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
+            z-index: 100;
+            transition: transform 0.3s ease;
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .logo-icon {
@@ -83,6 +87,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
+            margin-bottom: 25px;
+            flex-shrink: 0;
         }
 
         .new-chat-btn:hover {
@@ -90,13 +96,67 @@
             box-shadow: 0 0 15px var(--accent-glow);
         }
 
+        /* Список чатов в истории */
         .sidebar-content {
             flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .sidebar-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .chat-history-item {
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-history-item:hover, .chat-history-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: var(--text-main);
+        }
+        
+        .delete-chat-btn {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 14px;
+        }
+        
+        .chat-history-item:hover .delete-chat-btn {
+            opacity: 1;
         }
 
         .sidebar-footer {
             font-size: 12px;
             color: var(--text-muted);
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .status-online {
@@ -104,6 +164,7 @@
             font-weight: 600;
         }
 
+        /* Главная зона чата */
         .chat-container {
             flex-grow: 1;
             background-color: var(--chat-bg);
@@ -119,6 +180,19 @@
             background: rgba(19, 28, 46, 0.8);
             backdrop-filter: blur(12px);
             z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Кнопка меню для мобилок */
+        .menu-toggle-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 24px;
+            cursor: pointer;
         }
 
         .model-info h3 {
@@ -240,6 +314,56 @@
             transform: rotate(45deg) translate(-2px, 2px);
         }
 
+        /* Задний фон-затемнение для мобилок при открытом меню */
+        .sidebar-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 90;
+        }
+
+        /* АДАПТИВНОСТЬ ПОД ТЕЛЕФОНЫ */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar.open + .sidebar-overlay {
+                display: block;
+            }
+
+            .menu-toggle-btn {
+                display: block;
+            }
+
+            .chat-header {
+                padding: 15px 20px;
+            }
+
+            .messages-container {
+                padding: 20px;
+            }
+
+            .message {
+                max-width: 85%;
+                font-size: 14px;
+            }
+
+            .chat-input-area {
+                padding: 10px 20px 20px 20px;
+            }
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -255,21 +379,29 @@
 <body>
 
     <div class="app-container">
-        <aside class="sidebar">
+        <!-- Боковая панель -->
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <span class="logo-icon">⚡</span>
                 <h2>MixQZero AI</h2>
             </div>
-            <div class="sidebar-content">
-                <button class="new-chat-btn" onclick="clearChat()">+ Новый чат</button>
-            </div>
+            <button class="new-chat-btn" onclick="startNewChat()">+ Новый чат</button>
+            
+            <!-- Сюда динамически рендерятся старые чаты -->
+            <div class="sidebar-content" id="chatsList"></div>
+            
             <div class="sidebar-footer">
                 <p>Status: <span class="status-online">Online</span></p>
             </div>
         </aside>
 
+        <!-- Затемнение бэкграунда для мобилок -->
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Главное окно чата -->
         <main class="chat-container">
             <header class="chat-header">
+                <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
                 <div class="model-info">
                     <h3>Gemini 3.1 Flash Lite</h3>
                     <p>Интеллектуальный веб-ассистент</p>
@@ -296,34 +428,128 @@
         const userInput = document.getElementById('userInput');
         const messagesContainer = document.getElementById('messagesContainer');
         const sendBtn = document.getElementById('sendBtn');
+        const sidebar = document.getElementById('sidebar');
+        const chatsList = document.getElementById('chatsList');
 
-        // Ссылка на твой воркер для сайта
         const WORKER_URL = 'https://webai.mqz.workers.dev/'; 
 
-        let chatHistory = [];
+        // Глобальная структура данных для мульти-чатов
+        let allChats = {}; 
+        let currentChatId = null;
         const MAX_HISTORY = 16; 
 
+        // Инициализация приложения
         window.addEventListener('DOMContentLoaded', () => {
-            const savedHistory = localStorage.getItem('mixqzero_chat_history');
-            if (savedHistory) {
-                chatHistory = JSON.parse(savedHistory);
-                renderHistory();
-            } else {
-                showGreeting();
+            const savedAllChats = localStorage.getItem('mixqzero_all_chats');
+            const savedCurrentId = localStorage.getItem('mixqzero_current_chat_id');
+            
+            if (savedAllChats) {
+                allChats = JSON.parse(savedAllChats);
             }
+            
+            if (savedCurrentId && allChats[savedCurrentId]) {
+                currentChatId = savedCurrentId;
+                renderMessages();
+            } else {
+                startNewChat();
+            }
+            renderSidebarChats();
         });
 
-        function showGreeting() {
-            appendMessage('Привет! Я твой ИИ-помощник на базе Gemini 3.1 Flash Lite. Задавай любой вопрос!', 'ai-message', false);
+        // Переключение бургер-меню на мобилках
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
         }
 
-        function renderHistory() {
-            messagesContainer.innerHTML = '';
-            chatHistory.forEach(msg => {
-                const className = msg.role === 'user' ? 'user-message' : 'ai-message';
-                const text = msg.parts[0].text;
-                appendMessage(text, className, false);
+        // Создание нового чата
+        function startNewChat() {
+            currentChatId = 'chat_' + Date.now();
+            allChats[currentChatId] = {
+                title: 'Новый чат',
+                history: []
+            };
+            saveToLocalStorage();
+            renderMessages();
+            renderSidebarChats();
+            
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        // Рендеринг списка чатов в боковой панели
+        function renderSidebarChats() {
+            chatsList.innerHTML = '';
+            
+            // Сортируем от новых к старым
+            const sortedIds = Object.keys(allChats).sort((a, b) => b.split('_')[1] - a.split('_')[1]);
+            
+            sortedIds.forEach(id => {
+                const item = document.createElement('div');
+                item.classList.add('chat-history-item');
+                if (id === currentChatId) item.classList.add('active');
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.textContent = allChats[id].title;
+                titleSpan.style.overflow = 'hidden';
+                titleSpan.style.textOverflow = 'ellipsis';
+                item.appendChild(titleSpan);
+                
+                // Кнопка удаления чата
+                const delBtn = document.createElement('button');
+                delBtn.classList.add('delete-chat-btn');
+                delBtn.innerHTML = '✕';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation(); // Чтобы не активировался клик по чату
+                    deleteChat(id);
+                };
+                item.appendChild(delBtn);
+
+                item.onclick = () => {
+                    currentChatId = id;
+                    localStorage.setItem('mixqzero_current_chat_id', currentChatId);
+                    renderMessages();
+                    renderSidebarChats();
+                    if (window.innerWidth <= 768) {
+                        toggleSidebar(); // Закрываем меню на мобилках при выборе
+                    }
+                };
+                
+                chatsList.appendChild(item);
             });
+        }
+
+        // Рендеринг сообщений активного чата
+        function renderMessages() {
+            messagesContainer.innerHTML = '';
+            const history = allChats[currentChatId].history;
+            
+            if (history.length === 0) {
+                appendMessage('Привет! Я твой ИИ-помощник на базе Gemini 3.1 Flash Lite. Задавай любой вопрос!', 'ai-message', false);
+            } else {
+                history.forEach(msg => {
+                    const className = msg.role === 'user' ? 'user-message' : 'ai-message';
+                    appendMessage(msg.parts[0].text, className, false);
+                });
+            }
+        }
+
+        // Удаление конкретного чата
+        function deleteChat(id) {
+            delete allChats[id];
+            saveToLocalStorage();
+            
+            if (currentChatId === id) {
+                const keys = Object.keys(allChats);
+                if (keys.length > 0) {
+                    currentChatId = keys[keys.length - 1];
+                } else {
+                    startNewChat();
+                    return;
+                }
+            }
+            renderMessages();
+            renderSidebarChats();
         }
 
         chatForm.addEventListener('submit', async (e) => {
@@ -335,21 +561,28 @@
             userInput.disabled = true;
             sendBtn.disabled = true;
 
+            // Если это первое сообщение — переименовываем чат по тексту вопроса
+            if (allChats[currentChatId].history.length === 0) {
+                allChats[currentChatId].title = text.length > 22 ? text.substring(0, 20) + '...' : text;
+                renderSidebarChats();
+            }
+
             appendMessage(text, 'user-message', false);
-            chatHistory.push({ role: 'user', parts: [{ text: text }] });
+            allChats[currentChatId].history.push({ role: 'user', parts: [{ text: text }] });
             saveToLocalStorage();
 
             const loadingElement = appendMessage('<div class="loading-dots">Секунду<span>.</span><span>.</span><span>.</span></div>', 'ai-message', false);
 
             try {
-                if (chatHistory.length > MAX_HISTORY) {
-                    chatHistory = chatHistory.slice(-MAX_HISTORY);
+                let historyToSend = allChats[currentChatId].history;
+                if (historyToSend.length > MAX_HISTORY) {
+                    historyToSend = historyToSend.slice(-MAX_HISTORY);
                 }
 
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ history: chatHistory })
+                    body: JSON.stringify({ history: historyToSend })
                 });
 
                 const data = await response.json();
@@ -358,7 +591,7 @@
                 if (response.ok && data.reply) {
                     const aiReply = data.reply;
                     
-                    chatHistory.push({ role: 'model', parts: [{ text: aiReply }] });
+                    allChats[currentChatId].history.push({ role: 'model', parts: [{ text: aiReply }] });
                     saveToLocalStorage();
 
                     appendMessage(aiReply, 'ai-message', true);
@@ -384,7 +617,7 @@
             
             if (typeEffect) {
                 let index = 0;
-                const speed = 15; 
+                const speed = 12; 
                 
                 function typeWriter() {
                     if (index < content.length) {
@@ -404,14 +637,8 @@
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('mixqzero_chat_history', JSON.stringify(chatHistory));
-        }
-
-        function clearChat() {
-            localStorage.removeItem('mixqzero_chat_history');
-            chatHistory = [];
-            messagesContainer.innerHTML = '';
-            showGreeting();
+            localStorage.setItem('mixqzero_all_chats', JSON.stringify(allChats));
+            localStorage.setItem('mixqzero_current_chat_id', currentChatId);
         }
     </script>
 </body>
