@@ -193,6 +193,34 @@
             padding-top: 15px;
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Кнопка ТГ-Бота в сайдбаре */
+        .tg-bot-sidebar-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(36, 161, 222, 0.15), rgba(99, 102, 241, 0.15));
+            border: 1px solid rgba(36, 161, 222, 0.3);
+            border-radius: 8px;
+            color: var(--text-main);
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tg-bot-sidebar-btn:hover {
+            border-color: #24a1de;
+            background: linear-gradient(135deg, rgba(36, 161, 222, 0.25), rgba(99, 102, 241, 0.25));
+            box-shadow: 0 0 12px rgba(36, 161, 222, 0.2);
         }
 
         .settings-btn-trigger {
@@ -297,6 +325,18 @@
             align-self: flex-start;
             border-bottom-left-radius: 4px;
             border: 1px solid var(--border-color);
+        }
+
+        /* Ссылки внутри ответов ИИ */
+        .ai-message a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dashed rgba(129, 140, 248, 0.5);
+            transition: color 0.2s;
+        }
+        .ai-message a:hover {
+            color: #a5b4fc;
         }
 
         /* Настройки элементов разметки внутри ответа ИИ */
@@ -529,7 +569,12 @@
             </div>
             <button class="new-chat-btn" id="newChatBtnSide" onclick="startNewChat()">+ Новый чат</button>
             <div class="sidebar-content" id="chatsList"></div>
+            
             <div class="sidebar-footer">
+                <!-- КНОПКА ТГ БОТА -->
+                <a href="https://t.me/mixqzeroai_bot" target="_blank" class="tg-bot-sidebar-btn" id="tgBotSidebarBtn">
+                    🧬 ИИ в телеграмме
+                </a>
                 <button class="settings-btn-trigger" onclick="openModal()" id="settingsBtnLabel">⚙️ Настройки</button>
             </div>
         </aside>
@@ -620,10 +665,11 @@
                 tg: "Телеграмм канал",
                 mainSite: "Основной сайт",
                 tariff: "Бесплатный тариф (на весь сервер 500 запросов в день)",
-                greeting: "Привет! Я твой ИИ-помощник на базе Gemini 3.1 Flash Lite. Задавай любой вопрос!",
+                greeting: "Привет! Я твой ИИ-помощник на базе Gemini 3.1 Flash Lite. Также я есть в телеграмме 👉 [t.me/mixqzeroai_bot](https://t.me/mixqzeroai_bot). Задавай любой вопрос!",
                 errorNet: "❌ Ошибка сети. Проверь статус Воркера и настройки его переменных.",
                 loading: "Секунду",
-                copied: "Скопировано!"
+                copied: "Скопировано!",
+                tgSidebarBtn: "🧬 ИИ в телеграмме"
             },
             en: {
                 placeholder: "Ask a question...",
@@ -635,10 +681,11 @@
                 tg: "Telegram Channel",
                 mainSite: "Main Website",
                 tariff: "Free Plan (500 requests per day across server)",
-                greeting: "Hello! I am your AI assistant powered by Gemini 3.1 Flash Lite. Ask me anything!",
+                greeting: "Hello! I am your AI assistant powered by Gemini 3.1 Flash Lite. I am also available on Telegram 👉 [t.me/mixqzeroai_bot](https://t.me/mixqzeroai_bot). Ask me anything!",
                 errorNet: "❌ Network error. Check your Worker status and environment variables.",
                 loading: "Hold on",
-                copied: "Copied!"
+                copied: "Copied!",
+                tgSidebarBtn: "🧬 AI in Telegram"
             }
         };
 
@@ -726,6 +773,7 @@
             document.getElementById('linkTg').textContent = t.tg;
             document.getElementById('linkMain').textContent = t.mainSite;
             document.getElementById('serverTariffLabel').textContent = t.tariff;
+            document.getElementById('tgBotSidebarBtn').textContent = t.tgSidebarBtn;
             
             if (allChats[currentChatId] && allChats[currentChatId].history.length === 0) {
                 messagesContainer.innerHTML = '';
