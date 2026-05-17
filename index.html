@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MixQZero AI Chat</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --sidebar-bg: #111827;
+            --chat-bg: #131c2e;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --msg-user: #4f46e5;
+            --msg-ai: #1f293d;
+            --border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo h2 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px dashed var(--accent);
+            color: var(--text-main);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .new-chat-btn:hover {
+            background: var(--accent-glow);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .sidebar-content {
+            flex-grow: 1;
+        }
+
+        .sidebar-footer {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .status-online {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            background-color: var(--chat-bg);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(19, 28, 46, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 10;
+        }
+
+        .model-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .model-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .messages-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease-out forwards;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .user-message {
+            background-color: var(--msg-user);
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .ai-message {
+            background-color: var(--msg-ai);
+            color: var(--text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 20px;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: .2s; }
+        .loading-dots span:nth-child(3) { animation-delay: .4s; }
+
+        .chat-input-area {
+            padding: 20px 30px 30px 30px;
+            background: linear-gradient(transparent, var(--chat-bg) 30%);
+        }
+
+        .input-wrapper {
+            display: flex;
+            background-color: rgba(31, 41, 61, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .input-wrapper input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-size: 15px;
+            padding: 8px;
+        }
+
+        .input-wrapper button {
+            background: var(--accent);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .input-wrapper button:hover {
+            background: #4f46e5;
+        }
+
+        .input-wrapper button svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            transform: rotate(45deg) translate(-2px, 2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes blink {
+            0% { opacity: .2; }
+            20% { opacity: 1; }
+            100% { opacity: .2; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <h2>MixQZero AI</h2>
+            </div>
+            <div class="sidebar-content">
+                <button class="new-chat-btn" onclick="clearChat()">+ Новый чат</button>
+            </div>
+            <div class="sidebar-footer">
+                <p>Status: <span class="status-online">Online</span></p>
+            </div>
+        </aside>
+
+        <main class="chat-container">
+            <header class="chat-header">
+                <div class="model-info">
+                    <h3>Gemini 3.1 Flash Lite</h3>
+                    <p>Интеллектуальный веб-ассистент</p>
+                </div>
+            </header>
+
+            <div class="messages-container" id="messagesContainer"></div>
+
+            <footer class="chat-input-area">
+                <form id="chatForm" class="input-wrapper">
+                    <input type="text" id="userInput" placeholder="Задайте вопрос..." autocomplete="off" required>
+                    <button type="submit" id="sendBtn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                        </svg>
+                    </button>
+                </form>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Ссылка на твой воркер для сайта
+        const WORKER_URL = 'https://webai.mqz.workers.dev/'; 
+
+        let chatHistory = [];
+        const MAX_HISTORY = 16; 
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedHistory = localStorage.getItem('mixqzero_chat_history');
+            if (savedHistory) {
+                chatHistory = JSON.parse(savedHistory);
+                renderHistory();
+            } else {
+                showGreeting();
+            }
+        });
+
+        function showGreeting() {
+            appendMessage('Привет! Я твой ИИ-помощник на базе Gemini 3.1 Flash Lite. Задавай любой вопрос!', 'ai-message', false);
+        }
+
+        function renderHistory() {
+            messagesContainer.innerHTML = '';
+            chatHistory.forEach(msg => {
+                const className = msg.role === 'user' ? 'user-message' : 'ai-message';
+                const text = msg.parts[0].text;
+                appendMessage(text, className, false);
+            });
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            userInput.value = '';
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            appendMessage(text, 'user-message', false);
+            chatHistory.push({ role: 'user', parts: [{ text: text }] });
+            saveToLocalStorage();
+
+            const loadingElement = appendMessage('<div class="loading-dots">Секунду<span>.</span><span>.</span><span>.</span></div>', 'ai-message', false);
+
+            try {
+                if (chatHistory.length > MAX_HISTORY) {
+                    chatHistory = chatHistory.slice(-MAX_HISTORY);
+                }
+
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: chatHistory })
+                });
+
+                const data = await response.json();
+                loadingElement.remove();
+
+                if (response.ok && data.reply) {
+                    const aiReply = data.reply;
+                    
+                    chatHistory.push({ role: 'model', parts: [{ text: aiReply }] });
+                    saveToLocalStorage();
+
+                    appendMessage(aiReply, 'ai-message', true);
+                } else {
+                    appendMessage(`❌ Ошибка: ${data.error || 'Не удалось получить ответ'}`, 'ai-message', false);
+                }
+
+            } catch (error) {
+                console.error(error);
+                loadingElement.remove();
+                appendMessage('❌ Ошибка сети. Проверь статус Воркера и настройки его переменных.', 'ai-message', false);
+            } finally {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        });
+
+        function appendMessage(content, className, typeEffect = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', className);
+            messagesContainer.appendChild(messageDiv);
+            
+            if (typeEffect) {
+                let index = 0;
+                const speed = 15; 
+                
+                function typeWriter() {
+                    if (index < content.length) {
+                        messageDiv.textContent += content.charAt(index);
+                        index++;
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        setTimeout(typeWriter, speed);
+                    }
+                }
+                typeWriter();
+            } else {
+                messageDiv.innerHTML = content;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            return messageDiv;
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('mixqzero_chat_history', JSON.stringify(chatHistory));
+        }
+
+        function clearChat() {
+            localStorage.removeItem('mixqzero_chat_history');
+            chatHistory = [];
+            messagesContainer.innerHTML = '';
+            showGreeting();
+        }
+    </script>
+</body>
+</html>
