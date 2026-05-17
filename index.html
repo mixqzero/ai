@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MixQZero AI Chat</title>
+    <title>MixQZero AI Chat | Beta</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        :root {
+        /* ЦВЕТОВЫЕ ПАЛИТРЫ (ТЕМЫ) */
+        :root, [data-theme="dark"] {
             --bg-dark: #0b0f19;
             --sidebar-bg: #111827;
             --chat-bg: #131c2e;
@@ -21,6 +22,35 @@
             --msg-user: #4f46e5;
             --msg-ai: #1f293d;
             --border-color: rgba(255, 255, 255, 0.05);
+            --modal-bg: #111827;
+        }
+
+        [data-theme="purple"] {
+            --bg-dark: #12072b;
+            --sidebar-bg: #1a0b36;
+            --chat-bg: #1e0d3d;
+            --accent: #d946ef;
+            --accent-glow: rgba(217, 70, 239, 0.15);
+            --text-main: #fdf4ff;
+            --text-muted: #c084fc;
+            --msg-user: #a21caf;
+            --msg-ai: #2e104d;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --modal-bg: #1a0b36;
+        }
+
+        [data-theme="light"] {
+            --bg-dark: #f3f4f6;
+            --sidebar-bg: #ffffff;
+            --chat-bg: #f9fafb;
+            --accent: #4f46e5;
+            --accent-glow: rgba(79, 70, 229, 0.1);
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --msg-user: #4f46e5;
+            --msg-ai: #f3f4f6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --modal-bg: #ffffff;
         }
 
         * {
@@ -30,12 +60,15 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* Плавное появление всего сайта при входе */
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            height: 100dvh; /* Динамическая высота подстраивается под мобильные панели браузеров */
+            height: 100dvh;
             display: flex;
             overflow: hidden;
+            opacity: 0;
+            animation: appFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .app-container {
@@ -54,27 +87,27 @@
             flex-direction: column;
             padding: 20px;
             z-index: 100;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, background-color 0.3s;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 20px;
         }
 
         .logo-icon {
-            font-size: 24px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            font-size: 22px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .logo h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .new-chat-btn {
@@ -96,7 +129,7 @@
             box-shadow: 0 0 15px var(--accent-glow);
         }
 
-        /* Список чатов в истории */
+        /* Список чатов */
         .sidebar-content {
             flex-grow: 1;
             overflow-y: auto;
@@ -106,9 +139,7 @@
             padding-right: 4px;
         }
 
-        .sidebar-content::-webkit-scrollbar {
-            width: 4px;
-        }
+        .sidebar-content::-webkit-scrollbar { width: 4px; }
         .sidebar-content::-webkit-scrollbar-thumb {
             background: rgba(255,255,255,0.1);
             border-radius: 2px;
@@ -132,8 +163,8 @@
         }
 
         .chat-history-item:hover, .chat-history-item.active {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: var(--accent-glow);
+            border-color: rgba(99, 102, 241, 0.2);
             color: var(--text-main);
         }
         
@@ -145,26 +176,38 @@
             opacity: 0;
             transition: opacity 0.2s;
             font-size: 14px;
+            padding-left: 5px;
         }
         
-        .chat-history-item:hover .delete-chat-btn {
-            opacity: 1;
-        }
+        .chat-history-item:hover .delete-chat-btn { opacity: 1; }
 
         .sidebar-footer {
-            font-size: 12px;
-            color: var(--text-muted);
             padding-top: 15px;
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
         }
 
-        .status-online {
-            color: #10b981;
-            font-weight: 600;
+        /* Кнопка настроек в футере */
+        .settings-btn-trigger {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .settings-btn-trigger:hover {
+            background: rgba(255,255,255,0.07);
         }
 
-        /* Главная зона чата */
+        /* Зона чата */
         .chat-container {
             flex-grow: 1;
             background-color: var(--chat-bg);
@@ -172,31 +215,40 @@
             flex-direction: column;
             height: 100%;
             position: relative;
+            transition: background-color 0.3s;
         }
 
         .chat-header {
-            padding: 20px 30px;
+            padding: 15px 30px;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(19, 28, 46, 0.8);
+            background: rgba(19, 28, 46, 0.4);
             backdrop-filter: blur(12px);
             z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        /* Кнопка меню для мобилок */
-        .menu-toggle-btn {
-            display: none;
+        .menu-toggle-btn, .header-add-btn {
             background: transparent;
             border: none;
             color: var(--text-main);
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
         }
+        
+        .header-add-btn { font-size: 26px; }
 
         .model-info h3 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
         }
 
@@ -216,9 +268,7 @@
             scroll-behavior: smooth;
         }
 
-        .messages-container::-webkit-scrollbar {
-            width: 6px;
-        }
+        .messages-container::-webkit-scrollbar { width: 6px; }
         .messages-container::-webkit-scrollbar-thumb {
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
@@ -240,7 +290,7 @@
             color: #ffffff;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
         }
 
         .ai-message {
@@ -260,7 +310,7 @@
         .loading-dots span:nth-child(2) { animation-delay: .2s; }
         .loading-dots span:nth-child(3) { animation-delay: .4s; }
 
-        /* Область ввода с защитой от перекрытия панелями навигации */
+        /* Поле ввода ввода переходящее наверх при заполнении строки */
         .chat-input-area {
             padding: 15px 30px 25px 30px; 
             background: linear-gradient(transparent, var(--chat-bg) 30%);
@@ -269,11 +319,11 @@
 
         .input-wrapper {
             display: flex;
-            background-color: rgba(31, 41, 61, 0.6);
+            background-color: rgba(31, 41, 61, 0.5);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 8px 12px;
-            align-items: center;
+            border-radius: 14px;
+            padding: 10px 14px;
+            align-items: flex-end; /* Выравнивание кнопок по нижнему краю при росте инпута */
             transition: all 0.3s ease;
         }
 
@@ -282,101 +332,161 @@
             box-shadow: 0 0 15px var(--accent-glow);
         }
 
-        .input-wrapper input {
+        /* Заменили input на textarea для автопереноса строк наверх */
+        .input-wrapper textarea {
             flex-grow: 1;
             background: transparent;
             border: none;
             outline: none;
             color: var(--text-main);
             font-size: 15px;
-            padding: 8px;
+            padding: 4px 8px;
+            resize: none;
+            max-height: 180px;
+            min-height: 24px;
+            line-height: 1.4;
         }
 
         .input-wrapper button {
             background: var(--accent);
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
+            flex-shrink: 0;
         }
+        .input-wrapper button:hover { background: #4f46e5; }
+        .input-wrapper button svg { width: 18px; height: 18px; fill: white; }
 
-        .input-wrapper button:hover {
-            background: #4f46e5;
-        }
-
-        .input-wrapper button svg {
-            width: 18px;
-            height: 18px;
-            fill: white;
-            transform: rotate(45deg) translate(-2px, 2px);
-        }
-
-        /* Задний фон-затемнение для мобилок при открытом меню */
-        .sidebar-overlay {
-            display: none;
-            position: absolute;
+        /* ОКНО НАСТРОЕК (МЕНЮ) */
+        .modal-overlay {
+            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 90;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        /* АДАПТИВНОСТЬ ПОД ТЕЛЕФОНЫ */
+        .settings-modal {
+            background-color: var(--modal-bg);
+            border: 1px solid var(--border-color);
+            width: 420px;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transform: scale(0.92);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .modal-overlay.open .settings-modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h4 { font-size: 18px; font-weight: 600; }
+        .close-modal-btn {
+            background: transparent; border:none; color: var(--text-muted);
+            font-size: 20px; cursor: pointer;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .setting-group label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        
+        .setting-group select {
+            width: 100%; padding: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px; outline: none; cursor: pointer;
+        }
+        .setting-group select option { background: var(--sidebar-bg); }
+
+        .settings-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .settings-link-btn {
+            width: 100%; padding: 11px;
+            background: var(--accent-glow);
+            border: 1px solid transparent;
+            color: var(--text-main);
+            text-align: center; border-radius: 8px;
+            text-decoration: none; font-size: 14px; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .settings-link-btn:hover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        .modal-footer-status {
+            font-size: 12px; color: var(--text-muted);
+            text-align: center; border-top: 1px solid var(--border-color);
+            padding-top: 15px; margin-top: 5px;
+        }
+        .status-online { color: #10b981; font-weight: 600; }
+
+        .sidebar-overlay {
+            display: none; position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 90;
+        }
+
+        .menu-toggle-btn { display: none; }
+
+        /* АДАПТИВНОСТЬ */
         @media (max-width: 768px) {
             .sidebar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
+                position: absolute; top: 0; left: 0; bottom: 0;
                 transform: translateX(-100%);
             }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar.open + .sidebar-overlay { display: block; }
+            .menu-toggle-btn { display: block; }
 
-            .sidebar.open + .sidebar-overlay {
-                display: block;
-            }
+            .chat-header { padding: 15px 20px; }
+            .messages-container { padding: 20px; }
+            .message { max-width: 85%; font-size: 14px; }
+            .chat-input-area { padding: 10px 15px 25px 15px; }
 
-            .menu-toggle-btn {
-                display: block;
-            }
-
-            .chat-header {
-                padding: 15px 20px;
-            }
-
-            .messages-container {
+            /* Настройки почти во весь экран на смартфонах */
+            .settings-modal {
+                width: 90%;
+                max-height: 85vh;
                 padding: 20px;
             }
-
-            .message {
-                max-width: 85%;
-                font-size: 14px;
-            }
-
-            /* Специальный отступ для инпута на смартфонах, чтобы приподнять его над строкой Яндекса/Safari */
-            .chat-input-area {
-                padding: 10px 15px 25px 15px; 
-            }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes blink {
-            0% { opacity: .2; }
-            20% { opacity: 1; }
-            100% { opacity: .2; }
-        }
+        @keyframes appFadeIn { to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes blink { 0%, 100% { opacity: .2; } 20% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -386,44 +496,88 @@
         <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <span class="logo-icon">⚡</span>
-                <h2>MixQZero AI</h2>
+                <h2 id="logoText">MixQZero AI | Beta</h2>
             </div>
-            <button class="new-chat-btn" onclick="startNewChat()">+ Новый чат</button>
+            <button class="new-chat-btn" id="newChatBtnSide" onclick="startNewChat()">+ Новый чат</button>
             
-            <!-- Сюда динамически рендерятся старые чаты -->
             <div class="sidebar-content" id="chatsList"></div>
             
             <div class="sidebar-footer">
-                <p>Status: <span class="status-online">Online</span></p>
+                <button class="settings-btn-trigger" onclick="openModal()" id="settingsBtnLabel">
+                    ⚙️ Настройки
+                </button>
             </div>
         </aside>
 
-        <!-- Затемнение бэкграунда для мобилок -->
         <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
         <!-- Главное окно чата -->
         <main class="chat-container">
             <header class="chat-header">
-                <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-                <div class="model-info">
-                    <h3>Gemini 3.1 Flash Lite</h3>
-                    <p>Интеллектуальный веб-ассистент</p>
+                <div class="header-left">
+                    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+                    <div class="model-info">
+                        <h3>Gemini 3.1 Flash Lite</h3>
+                        <p id="serverTariffLabel">Бесплатный тариф (на весь сервер 500 запросов в день)</p>
+                    </div>
                 </div>
+                <button class="header-add-btn" onclick="startNewChat()" title="Новый чат">+</button>
             </header>
 
             <div class="messages-container" id="messagesContainer"></div>
 
             <footer class="chat-input-area">
                 <form id="chatForm" class="input-wrapper">
-                    <input type="text" id="userInput" placeholder="Задайте вопрос..." autocomplete="off" required>
+                    <!-- Заменили на textarea для автопереноса вверх -->
+                    <textarea id="userInput" placeholder="Задайте вопрос..." rows="1" autocomplete="off" required></textarea>
                     <button type="submit" id="sendBtn">
+                        <!-- Самолетик, смотрящий ровно вправо -->
                         <svg viewBox="0 0 24 24">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"></path>
                         </svg>
                     </button>
                 </form>
             </footer>
         </main>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО НАСТРОЕК -->
+    <div class="modal-overlay" id="settingsModalOverlay" onclick="closeModal(event)">
+        <div class="settings-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h4 id="modalTitle">Настройки</h4>
+                <button class="close-modal-btn" onclick="closeModal()">✕</button>
+            </div>
+
+            <!-- Смена тем -->
+            <div class="setting-group">
+                <label id="themeLabel">Тема оформления</label>
+                <select id="themeSelect" onchange="changeTheme(this.value)">
+                    <option value="dark">Темная</option>
+                    <option value="purple">Фиолетовая</option>
+                    <option value="light">Светлая</option>
+                </select>
+            </div>
+
+            <!-- Смена языка -->
+            <div class="setting-group">
+                <label id="langLabel">Язык интерфейса</label>
+                <select id="langSelect" onchange="changeLanguage(this.value)">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <!-- Ссылки -->
+            <div class="settings-links">
+                <a href="https://t.me/mixqzero" target="_blank" class="settings-link-btn" id="linkTg">Телеграмм канал</a>
+                <a href="https://mixqzero.github.io/main" target="_blank" class="settings-link-btn" id="linkMain">Основной сайт</a>
+            </div>
+
+            <div class="modal-footer-status">
+                <span id="statusLabel">Status:</span> <span class="status-online">Online</span>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -433,21 +587,52 @@
         const sendBtn = document.getElementById('sendBtn');
         const sidebar = document.getElementById('sidebar');
         const chatsList = document.getElementById('chatsList');
+        const modal = document.getElementById('settingsModalOverlay');
 
         const WORKER_URL = 'https://webai.mqz.workers.dev/'; 
 
         let allChats = {}; 
         let currentChatId = null;
         const MAX_HISTORY = 16; 
+        let currentLang = 'ru';
 
-        // Инициализация приложения
+        // Языковой пакет
+        const translations = {
+            ru: {
+                placeholder: "Задайте вопрос...",
+                newChat: "+ Новый чат",
+                settings: "⚙️ Настройки",
+                modalTitle: "Настройки",
+                theme: "Тема оформления",
+                lang: "Язык интерфейса",
+                tg: "Телеграмм канал",
+                mainSite: "Основной сайт",
+                tariff: "Бесплатный тариф (на весь сервер 500 запросов в день)",
+                greeting: "Привет! Я твой ИИ-помощник на базе Gemini 3.1 Flash Lite. Задавай любой вопрос!",
+                errorNet: "❌ Ошибка сети. Проверь статус Воркера и настройки его переменных.",
+                loading: "Секунду"
+            },
+            en: {
+                placeholder: "Ask a question...",
+                newChat: "+ New Chat",
+                settings: "⚙️ Settings",
+                modalTitle: "Settings",
+                theme: "Theme",
+                lang: "Language",
+                tg: "Telegram Channel",
+                mainSite: "Main Website",
+                tariff: "Free Plan (500 requests per day across server)",
+                greeting: "Hello! I am your AI assistant powered by Gemini 3.1 Flash Lite. Ask me anything!",
+                errorNet: "❌ Network error. Check your Worker status and environment variables.",
+                loading: "Hold on"
+            }
+        };
+
         window.addEventListener('DOMContentLoaded', () => {
+            // Загрузка чатов
             const savedAllChats = localStorage.getItem('mixqzero_all_chats');
             const savedCurrentId = localStorage.getItem('mixqzero_current_chat_id');
-            
-            if (savedAllChats) {
-                allChats = JSON.parse(savedAllChats);
-            }
+            if (savedAllChats) allChats = JSON.parse(savedAllChats);
             
             if (savedCurrentId && allChats[savedCurrentId]) {
                 currentChatId = savedCurrentId;
@@ -456,33 +641,79 @@
                 startNewChat();
             }
             renderSidebarChats();
+
+            // Загрузка темы
+            const savedTheme = localStorage.getItem('mixqzero_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeSelect').value = savedTheme;
+
+            // Загрузка языка
+            const savedLang = localStorage.getItem('mixqzero_lang') || 'ru';
+            currentLang = savedLang;
+            document.getElementById('langSelect').value = savedLang;
+            applyLanguage();
         });
 
-        // Переключение бургер-меню на мобилках
-        function toggleSidebar() {
-            sidebar.classList.toggle('open');
+        // Автоматическое увеличение высоты инпута (строка растет вверх)
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight - 4) + 'px';
+            if(this.value === '') this.style.height = '24px';
+        });
+
+        // Отправка по Enter (без Shift)
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.requestSubmit();
+            }
+        });
+
+        function toggleSidebar() { sidebar.classList.toggle('open'); }
+        function openModal() { modal.classList.add('open'); }
+        function closeModal() { modal.classList.remove('open'); }
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('mixqzero_theme', theme);
         }
 
-        // Создание нового чата
-        function startNewChat() {
-            currentChatId = 'chat_' + Date.now();
-            allChats[currentChatId] = {
-                title: 'Новый чат',
-                history: []
-            };
-            saveToLocalStorage();
-            renderMessages();
-            renderSidebarChats();
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('mixqzero_lang', lang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            userInput.placeholder = t.placeholder;
+            document.getElementById('newChatBtnSide').textContent = t.newChat;
+            document.getElementById('settingsBtnLabel').textContent = t.settings;
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('themeLabel').textContent = t.theme;
+            document.getElementById('langLabel').textContent = t.lang;
+            document.getElementById('linkTg').textContent = t.tg;
+            document.getElementById('linkMain').textContent = t.mainSite;
+            document.getElementById('serverTariffLabel').textContent = t.tariff;
             
-            if (sidebar.classList.contains('open')) {
-                toggleSidebar();
+            // Если в чате ничего нет, обновляем приветствие на нужном языке
+            if (allChats[currentChatId].history.length === 0) {
+                messagesContainer.innerHTML = '';
+                appendMessage(t.greeting, 'ai-message', false);
             }
         }
 
-        // Рендеринг списка чатов в боковой панели
+        function startNewChat() {
+            currentChatId = 'chat_' + Date.now();
+            allChats[currentChatId] = { title: currentLang === 'ru' ? 'Новый чат' : 'New Chat', history: [] };
+            saveToLocalStorage();
+            renderMessages();
+            renderSidebarChats();
+            if (sidebar.classList.contains('open')) toggleSidebar();
+        }
+
         function renderSidebarChats() {
             chatsList.innerHTML = '';
-            
             const sortedIds = Object.keys(allChats).sort((a, b) => b.split('_')[1] - a.split('_')[1]);
             
             sortedIds.forEach(id => {
@@ -499,10 +730,7 @@
                 const delBtn = document.createElement('button');
                 delBtn.classList.add('delete-chat-btn');
                 delBtn.innerHTML = '✕';
-                delBtn.onclick = (e) => {
-                    e.stopPropagation(); 
-                    deleteChat(id);
-                };
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteChat(id); };
                 item.appendChild(delBtn);
 
                 item.onclick = () => {
@@ -510,22 +738,17 @@
                     localStorage.setItem('mixqzero_current_chat_id', currentChatId);
                     renderMessages();
                     renderSidebarChats();
-                    if (window.innerWidth <= 768) {
-                        toggleSidebar(); 
-                    }
+                    if (window.innerWidth <= 768) toggleSidebar();
                 };
-                
                 chatsList.appendChild(item);
             });
         }
 
-        // Рендеринг сообщений активного чата
         function renderMessages() {
             messagesContainer.innerHTML = '';
             const history = allChats[currentChatId].history;
-            
             if (history.length === 0) {
-                appendMessage('Привет! Я твой ИИ-помощник на базе Gemini 3.1 Flash Lite. Задавай любой вопрос!', 'ai-message', false);
+                appendMessage(translations[currentLang].greeting, 'ai-message', false);
             } else {
                 history.forEach(msg => {
                     const className = msg.role === 'user' ? 'user-message' : 'ai-message';
@@ -534,19 +757,13 @@
             }
         }
 
-        // Удаление конкретного чата
         function deleteChat(id) {
             delete allChats[id];
             saveToLocalStorage();
-            
             if (currentChatId === id) {
                 const keys = Object.keys(allChats);
-                if (keys.length > 0) {
-                    currentChatId = keys[keys.length - 1];
-                } else {
-                    startNewChat();
-                    return;
-                }
+                if (keys.length > 0) currentChatId = keys[keys.length - 1];
+                else { startNewChat(); return; }
             }
             renderMessages();
             renderSidebarChats();
@@ -558,9 +775,11 @@
             if (!text) return;
 
             userInput.value = '';
+            userInput.style.height = '24px'; // Сбрасываем высоту textarea
             userInput.disabled = true;
             sendBtn.disabled = true;
 
+            // Навешиваем название чата строго по началу ПЕРВОГО запроса пользователя
             if (allChats[currentChatId].history.length === 0) {
                 allChats[currentChatId].title = text.length > 22 ? text.substring(0, 20) + '...' : text;
                 renderSidebarChats();
@@ -570,7 +789,7 @@
             allChats[currentChatId].history.push({ role: 'user', parts: [{ text: text }] });
             saveToLocalStorage();
 
-            const loadingElement = appendMessage('<div class="loading-dots">Секунду<span>.</span><span>.</span><span>.</span></div>', 'ai-message', false);
+            const loadingElement = appendMessage(`<div class="loading-dots">${translations[currentLang].loading}<span>.</span><span>.</span><span>.</span></div>`, 'ai-message', false);
 
             try {
                 let historyToSend = allChats[currentChatId].history;
@@ -589,19 +808,17 @@
 
                 if (response.ok && data.reply) {
                     const aiReply = data.reply;
-                    
                     allChats[currentChatId].history.push({ role: 'model', parts: [{ text: aiReply }] });
                     saveToLocalStorage();
-
                     appendMessage(aiReply, 'ai-message', true);
                 } else {
-                    appendMessage(`❌ Ошибка: ${data.error || 'Не удалось получить ответ'}`, 'ai-message', false);
+                    appendMessage(`❌ Error: ${data.error || 'Failed to get answer'}`, 'ai-message', false);
                 }
 
             } catch (error) {
                 console.error(error);
                 loadingElement.remove();
-                appendMessage('❌ Ошибка сети. Проверь статус Воркера и настройки его переменных.', 'ai-message', false);
+                appendMessage(translations[currentLang].errorNet, 'ai-message', false);
             } finally {
                 userInput.disabled = false;
                 sendBtn.disabled = false;
@@ -616,8 +833,7 @@
             
             if (typeEffect) {
                 let index = 0;
-                const speed = 12; 
-                
+                const speed = 10; 
                 function typeWriter() {
                     if (index < content.length) {
                         messageDiv.textContent += content.charAt(index);
@@ -631,7 +847,6 @@
                 messageDiv.innerHTML = content;
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
-            
             return messageDiv;
         }
 
