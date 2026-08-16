@@ -9,15 +9,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- ПОДКЛЮЧАЕМ СТИЛИ ДЛЯ ПОДСВЕТКИ КОДА (Тема VS Code / Atom Dark) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 
-    <!-- ПОДКЛЮЧАЕМ СКРИПТЫ ДЛЯ МАРКДАУНА И ПОДСВЕТКИ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <style>
-        /* ЦВЕТОВЫЕ ПАЛИТРЫ (ТЕМЫ) - АДАПТИРОВАНО ПОД ДИЗАЙН ГЛАВНОЙ */
         :root, [data-theme="dark"] {
             --bg-dark: #12002b;
             --sidebar-bg: rgba(10, 5, 20, 0.95);
@@ -73,21 +70,26 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
+     
         body {
-            background: linear-gradient(-45deg, #12002b, #2a0845, #6a1b9a, #11001c);
-            background-size: 400% 400%;
-            animation: purpleGoldGradientShift 15s ease infinite;
+            background: linear-gradient(135deg, #12002b 0%, #2a0845 50%, #11001c 100%);
+            background-attachment: fixed;
             color: var(--text-main);
             height: 100dvh;
             display: flex;
             overflow: hidden;
             opacity: 0;
-            animation: appFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards, purpleGoldGradientShift 15s ease infinite;
+            animation: appFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
         [data-theme="light"] body {
-            background: linear-gradient(-45deg, #e0e0e0, #f5f5f5, #ffffff, #e0e0e0);
-            background-size: 400% 400%;
+            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 50%, #ffffff 100%);
+            background-attachment: fixed;
+        }
+
+        [data-theme="purple"] body {
+            background: linear-gradient(135deg, #1a0533 0%, #2a0845 50%, #12002b 100%);
+            background-attachment: fixed;
         }
 
         .app-container {
@@ -95,7 +97,6 @@
             width: 100%;
             height: 100%;
             position: relative;
-            backdrop-filter: var(--glass-blur);
         }
 
         /* Боковая панель */
@@ -219,7 +220,6 @@
             gap: 12px;
         }
 
-        /* Кнопка ТГ-Бота в сайдбаре */
         .tg-bot-sidebar-btn {
             width: 100%;
             padding: 12px;
@@ -277,7 +277,6 @@
             flex-direction: column;
             height: 100%;
             position: relative;
-            transition: background-color 0.3s;
         }
 
         .chat-header {
@@ -333,7 +332,6 @@
             border-radius: 4px;
         }
 
-        /* КРАСИВОЕ ОФОРМЛЕНИЕ MARKDOWN В ОТВЕТАХ */
         .message {
             max-width: 80%;
             padding: 16px 20px;
@@ -363,7 +361,6 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Ссылки внутри ответов ИИ */
         .ai-message a {
             color: var(--accent);
             text-decoration: none;
@@ -375,7 +372,6 @@
             text-shadow: 0 0 8px var(--accent-glow);
         }
 
-        /* Настройки элементов разметки внутри ответа ИИ */
         .ai-message p { margin-bottom: 10px; }
         .ai-message p:last-child { margin-bottom: 0; }
         .ai-message h1, .ai-message h2, .ai-message h3 { margin: 15px 0 8px 0; font-weight: 700; color: var(--accent); }
@@ -389,7 +385,6 @@
         .ai-message ul, .ai-message ol { margin-left: 20px; margin-bottom: 10px; }
         .ai-message li { margin-bottom: 4px; }
 
-        /* ОКНО С КОДОМ И КНОПКОЙ КОПИРОВАНИЯ */
         .code-container {
             margin: 12px 0;
             border-radius: 12px;
@@ -438,7 +433,6 @@
             padding: 0;
         }
 
-        /* Встроенный короткий код внутри предложений `like this` */
         .ai-message :not(pre) > code {
             background: rgba(255, 255, 255, 0.1);
             padding: 2px 6px;
@@ -458,7 +452,6 @@
         .loading-dots span:nth-child(2) { animation-delay: .2s; }
         .loading-dots span:nth-child(3) { animation-delay: .4s; }
 
-        /* Поле ввода */
         .chat-input-area {
             padding: 15px 30px 25px 30px; 
             background: linear-gradient(transparent, rgba(0,0,0,0.4) 30%);
@@ -515,7 +508,7 @@
         }
         .input-wrapper button svg { width: 18px; height: 18px; fill: #000; }
 
-        /* НАСТРОЕЧНЫЙ МОДАЛ */
+      
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -615,7 +608,6 @@
         @keyframes appFadeIn { to { opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes blink { 0%, 100% { opacity: .2; } 20% { opacity: 1; } }
-        @keyframes purpleGoldGradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     </style>
 </head>
 <body>
@@ -630,7 +622,6 @@
             <div class="sidebar-content" id="chatsList"></div>
             
             <div class="sidebar-footer">
-                <!-- КНОПКА ТГ БОТА -->
                 <a href="https://t.me/mixqzeroai_bot" target="_blank" class="tg-bot-sidebar-btn" id="tgBotSidebarBtn">
                     🧬 ИИ в телеграмме
                 </a>
@@ -665,7 +656,6 @@
         </main>
     </div>
 
-    <!-- МОДАЛ НАСТРОЕК -->
     <div class="modal-overlay" id="settingsModalOverlay" onclick="closeModal(event)">
         <div class="settings-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -748,12 +738,10 @@
             }
         };
 
-        // НАСТРОЙКА КАЗСТОМНОГО ПАРСЕРА ДЛЯ БЛОКОВ КОДА
         const renderer = {
             code(code, infostring) {
                 const lang = infostring || 'text';
                 const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                
                 return `
                     <div class="code-container">
                         <div class="code-header">
