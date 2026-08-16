@@ -16,747 +16,153 @@
 
     <style>
         :root, [data-theme="dark"] {
-            --bg-dark: #12002b;
-            --sidebar-bg: rgba(10, 5, 20, 0.95);
-            --chat-bg: transparent;
-            --accent: #f1c40f;
-            --accent-glow: rgba(241, 196, 15, 0.25);
-            --text-main: #f0f0f0;
-            --text-muted: rgba(255, 255, 255, 0.6);
-            --msg-user: rgba(241, 196, 15, 0.15);
-            --msg-ai: rgba(255, 255, 255, 0.07);
-            --border-color: rgba(255, 255, 255, 0.18);
-            --modal-bg: rgba(10, 5, 20, 0.98);
-            --code-block-header: rgba(0, 0, 0, 0.4);
-            --glass-blur: blur(15px);
+            --bg-dark: #12002b; --sidebar-bg: rgba(10, 5, 20, 0.95); --chat-bg: transparent;
+            --accent: #f1c40f; --accent-glow: rgba(241, 196, 15, 0.25); --text-main: #f0f0f0;
+            --text-muted: rgba(255, 255, 255, 0.6); --msg-user: rgba(241, 196, 15, 0.15);
+            --msg-ai: rgba(255, 255, 255, 0.07); --border-color: rgba(255, 255, 255, 0.18);
+            --modal-bg: rgba(10, 5, 20, 0.98); --code-block-header: rgba(0, 0, 0, 0.4);
         }
-
         [data-theme="purple"] {
-            --bg-dark: #2a0845;
-            --sidebar-bg: rgba(20, 5, 30, 0.95);
-            --chat-bg: transparent;
-            --accent: #d946ef;
-            --accent-glow: rgba(217, 70, 239, 0.25);
-            --text-main: #fdf4ff;
-            --text-muted: rgba(255, 255, 255, 0.6);
-            --msg-user: rgba(217, 70, 239, 0.2);
-            --msg-ai: rgba(255, 255, 255, 0.07);
-            --border-color: rgba(255, 255, 255, 0.15);
-            --modal-bg: rgba(20, 5, 30, 0.98);
-            --code-block-header: rgba(0, 0, 0, 0.4);
-            --glass-blur: blur(15px);
+            --bg-dark: #2a0845; --sidebar-bg: rgba(20, 5, 30, 0.95); --chat-bg: transparent;
+            --accent: #d946ef; --accent-glow: rgba(217, 70, 239, 0.25); --text-main: #fdf4ff;
+            --text-muted: rgba(255, 255, 255, 0.6); --msg-user: rgba(217, 70, 239, 0.2);
+            --msg-ai: rgba(255, 255, 255, 0.07); --border-color: rgba(255, 255, 255, 0.15);
+            --modal-bg: rgba(20, 5, 30, 0.98); --code-block-header: rgba(0, 0, 0, 0.4);
         }
-
         [data-theme="light"] {
-            --bg-dark: #f5f5f5;
-            --sidebar-bg: rgba(255, 255, 255, 0.9);
-            --chat-bg: transparent;
-            --accent: #6a1b9a;
-            --accent-glow: rgba(106, 27, 154, 0.15);
-            --text-main: #1a1a2e;
-            --text-muted: #555;
-            --msg-user: rgba(106, 27, 154, 0.1);
-            --msg-ai: rgba(0, 0, 0, 0.05);
-            --border-color: rgba(0, 0, 0, 0.1);
-            --modal-bg: rgba(255, 255, 255, 0.95);
+            --bg-dark: #f5f5f5; --sidebar-bg: rgba(255, 255, 255, 0.9); --chat-bg: transparent;
+            --accent: #6a1b9a; --accent-glow: rgba(106, 27, 154, 0.15); --text-main: #1a1a2e;
+            --text-muted: #555; --msg-user: rgba(106, 27, 154, 0.1); --msg-ai: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.1); --modal-bg: rgba(255, 255, 255, 0.95);
             --code-block-header: rgba(0, 0, 0, 0.05);
-            --glass-blur: blur(20px);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        /* ГЛАВНОЕ ИСПРАВЛЕНИЕ — запрещаем горизонтальный скролл всей страницы */
-        html, body {
-            overflow-x: hidden;
-            max-width: 100vw;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        html, body { overflow-x: hidden; max-width: 100vw; }
 
         body {
             background: linear-gradient(135deg, #12002b 0%, #2a0845 50%, #11001c 100%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            height: 100dvh;
-            display: flex;
-            overflow: hidden;
-            opacity: 0;
-            animation: appFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            background-attachment: fixed; color: var(--text-main); height: 100dvh;
+            display: flex; overflow: hidden; opacity: 0; animation: appFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        [data-theme="light"] body { background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 50%, #ffffff 100%); background-attachment: fixed; }
+        [data-theme="purple"] body { background: linear-gradient(135deg, #1a0533 0%, #2a0845 50%, #12002b 100%); background-attachment: fixed; }
+
+        .app-container { display: flex; width: 100%; height: 100%; position: relative; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 280px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; z-index: 100; transition: transform 0.3s ease; }
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; }
+        .logo-icon { font-size: 24px; filter: drop-shadow(0 0 8px var(--accent)); }
+        .logo h2 { font-size: 18px; font-weight: 700; background: linear-gradient(90deg, #fff 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        [data-theme="light"] .logo h2 { background: linear-gradient(90deg, #1a1a2e 0%, var(--accent) 100%); -webkit-background-clip: text; }
         
-        [data-theme="light"] body {
-            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 50%, #ffffff 100%);
-            background-attachment: fixed;
-        }
-
-        [data-theme="purple"] body {
-            background: linear-gradient(135deg, #1a0533 0%, #2a0845 50%, #12002b 100%);
-            background-attachment: fixed;
-        }
-
-        .app-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            z-index: 100;
-            transition: transform 0.3s ease, background-color 0.3s;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .logo-icon {
-            font-size: 24px;
-            filter: drop-shadow(0 0 8px var(--accent));
-        }
-
-        .logo h2 {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            background: linear-gradient(90deg, #fff 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        [data-theme="light"] .logo h2 {
-            background: linear-gradient(90deg, #1a1a2e 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-        }
-
-        .new-chat-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--msg-ai);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            margin-bottom: 25px;
-            flex-shrink: 0;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 1px;
-        }
-
-        .new-chat-btn:hover {
-            background: var(--accent-glow);
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .sidebar-content {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding-right: 4px;
-        }
-
+        .new-chat-btn { width: 100%; padding: 14px; background: var(--msg-ai); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; margin-bottom: 25px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        .new-chat-btn:hover { background: var(--accent-glow); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        
+        .sidebar-content { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
         .sidebar-content::-webkit-scrollbar { width: 4px; }
-        .sidebar-content::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 2px;
-        }
-
-        .chat-history-item {
-            padding: 12px 14px;
-            background: var(--msg-ai);
-            border: 1px solid transparent;
-            border-radius: 12px;
-            font-size: 14px;
-            color: var(--text-muted);
-            cursor: pointer;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-history-item:hover, .chat-history-item.active {
-            background: var(--accent-glow);
-            border-color: var(--accent);
-            color: var(--text-main);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
+        .sidebar-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
         
-        .delete-chat-btn {
-            background: transparent;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s;
-            font-size: 14px;
-            padding-left: 8px;
-        }
-        
+        .chat-history-item { padding: 12px 14px; background: var(--msg-ai); border: 1px solid transparent; border-radius: 12px; font-size: 14px; color: var(--text-muted); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center; }
+        .chat-history-item:hover, .chat-history-item.active { background: var(--accent-glow); border-color: var(--accent); color: var(--text-main); }
+        .delete-chat-btn { background: transparent; border: none; color: #ef4444; cursor: pointer; opacity: 0; transition: opacity 0.2s; font-size: 14px; padding-left: 8px; }
         .chat-history-item:hover .delete-chat-btn { opacity: 1; }
-
-        .sidebar-footer {
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .tg-bot-sidebar-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, rgba(36, 161, 222, 0.1), rgba(241, 196, 15, 0.1));
-            border: 1px solid rgba(36, 161, 222, 0.3);
-            border-radius: 12px;
-            color: var(--text-main);
-            text-align: center;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .tg-bot-sidebar-btn:hover {
-            border-color: #24a1de;
-            background: linear-gradient(135deg, rgba(36, 161, 222, 0.2), rgba(241, 196, 15, 0.2));
-            box-shadow: 0 0 15px rgba(36, 161, 222, 0.3);
-        }
-
-        .settings-btn-trigger {
-            width: 100%;
-            padding: 12px;
-            background: var(--msg-ai);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-main);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .settings-btn-trigger:hover { 
-            background: var(--accent-glow); 
-            border-color: var(--accent);
-        }
-
-        .chat-container {
-            flex-grow: 1;
-            background-color: var(--chat-bg);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
-            /* КРИТИЧНО — не даём контейнеру расширяться за пределы экрана */
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            padding: 15px 30px;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            min-width: 0;
-        }
-
-        .menu-toggle-btn, .header-add-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 22px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
         
+        .sidebar-footer { padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px; }
+        .tg-bot-sidebar-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, rgba(36, 161, 222, 0.1), rgba(241, 196, 15, 0.1)); border: 1px solid rgba(36, 161, 222, 0.3); border-radius: 12px; color: var(--text-main); text-align: center; text-decoration: none; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; text-transform: uppercase; }
+        .tg-bot-sidebar-btn:hover { border-color: #24a1de; box-shadow: 0 0 15px rgba(36, 161, 222, 0.3); }
+        .settings-btn-trigger { width: 100%; padding: 12px; background: var(--msg-ai); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 600; transition: all 0.3s; text-transform: uppercase; }
+        .settings-btn-trigger:hover { background: var(--accent-glow); border-color: var(--accent); }
+
+        /* Chat Area */
+        .chat-container { flex-grow: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; overflow: hidden; }
+        .chat-header { padding: 15px 30px; border-bottom: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); z-index: 10; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 15px; min-width: 0; }
+        .menu-toggle-btn, .header-add-btn { background: transparent; border: none; color: var(--text-main); font-size: 22px; cursor: pointer; display: flex; align-items: center; }
         .header-add-btn { font-size: 26px; }
+        .model-info { min-width: 0; overflow: hidden; }
+        .model-info h3 { font-size: 16px; font-weight: 700; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .model-info p { font-size: 12px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .model-info {
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .model-info h3 { 
-            font-size: 16px; 
-            font-weight: 700; 
-            color: var(--accent);
-            text-shadow: 0 0 10px var(--accent-glow);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .model-info p { 
-            font-size: 12px; 
-            color: var(--text-muted); 
-            margin-top: 3px; 
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .messages-container {
-            flex-grow: 1;
-            padding: 30px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            scroll-behavior: smooth;
-            /* КРИТИЧНО — контейнер сообщений не шире родителя */
-            min-width: 0;
-            width: 100%;
-        }
-
+        .messages-container { flex-grow: 1; padding: 30px; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; min-width: 0; width: 100%; -webkit-overflow-scrolling: touch; }
         .messages-container::-webkit-scrollbar { width: 6px; }
-        .messages-container::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
-            border-radius: 4px;
-        }
+        .messages-container::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
 
-        .message {
-            /* ИСПРАВЛЕНИЕ — max-width через calc чтобы не вылезало */
-            max-width: min(80%, 100%);
-            width: fit-content;
-            padding: 16px 20px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.6;
-            animation: fadeIn 0.3s ease-out forwards;
-            /* КРИТИЧНО — перенос длинных слов и ограничение ширины */
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            border: 1px solid var(--border-color);
-            /* Не даём сообщению быть шире контейнера */
-            max-width: 80%;
-            min-width: 0;
-        }
+        .message { max-width: 80%; width: fit-content; padding: 16px 20px; border-radius: 18px; font-size: 15px; line-height: 1.6; animation: fadeIn 0.3s ease-out forwards; word-wrap: break-word; overflow-wrap: break-word; border: 1px solid var(--border-color); min-width: 0; }
+        .user-message { background-color: var(--msg-user); color: var(--text-main); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 20px var(--accent-glow); white-space: pre-wrap; border-color: var(--accent); display: flex; flex-direction: column; gap: 10px;}
+        .ai-message { background-color: var(--msg-ai); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; backdrop-filter: blur(5px); max-width: 80%; min-width: 0; }
+        
+        /* Стили для прикрепленного фото в сообщении пользователя */
+        .msg-image { max-width: 100%; max-height: 300px; border-radius: 12px; object-fit: contain; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
 
-        .user-message {
-            background-color: var(--msg-user);
-            color: var(--text-main);
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 20px var(--accent-glow);
-            white-space: pre-wrap;
-            border-color: var(--accent);
-        }
-
-        .ai-message {
-            background-color: var(--msg-ai);
-            color: var(--text-main);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            backdrop-filter: blur(5px);
-            /* КРИТИЧНО — AI сообщение не шире контейнера */
-            max-width: 80%;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .ai-message a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            border-bottom: 1px dashed var(--accent);
-            transition: all 0.2s;
-            word-break: break-all;
-        }
-        .ai-message a:hover {
-            text-shadow: 0 0 8px var(--accent-glow);
-        }
-
-        .ai-message p { margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word; }
-        .ai-message p:last-child { margin-bottom: 0; }
-        .ai-message h1, .ai-message h2, .ai-message h3 { margin: 15px 0 8px 0; font-weight: 700; color: var(--accent); word-wrap: break-word; }
-        .ai-message h1 { font-size: 1.4em; }
-        .ai-message h2 { font-size: 1.25em; }
-        .ai-message h3 { font-size: 1.1em; }
+        .ai-message a { color: var(--accent); text-decoration: none; font-weight: 600; border-bottom: 1px dashed var(--accent); word-break: break-all; }
+        .ai-message p { margin-bottom: 10px; } .ai-message p:last-child { margin-bottom: 0; }
+        .ai-message h1, .ai-message h2, .ai-message h3 { margin: 15px 0 8px 0; font-weight: 700; color: var(--accent); }
         .ai-message strong { color: var(--accent); font-weight: 700; }
         [data-theme="light"] .ai-message strong { color: var(--accent); }
-        .ai-message hr { border: 0; height: 1px; background: var(--border-color); margin: 15px 0; }
+        .ai-message ul, .ai-message ol { margin-left: 20px; margin-bottom: 10px; }
         
-        .ai-message ul, .ai-message ol { margin-left: 20px; margin-bottom: 10px; word-wrap: break-word; }
-        .ai-message li { margin-bottom: 4px; word-wrap: break-word; }
-
-        /* КРИТИЧНОЕ ИСПРАВЛЕНИЕ ДЛЯ БЛОКОВ КОДА */
-        .code-container {
-            margin: 12px 0;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background: rgba(0, 0, 0, 0.3);
-            /* Не даём блоку кода быть шире сообщения */
-            max-width: 100%;
-            width: 100%;
-            min-width: 0;
-        }
-
-        .code-header {
-            background: var(--code-block-header);
-            padding: 10px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: var(--accent);
-            font-family: monospace;
-            border-bottom: 1px solid var(--border-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-
-        .copy-code-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 11px;
-            text-transform: uppercase;
-            flex-shrink: 0;
-            white-space: nowrap;
-        }
+        .code-container { margin: 12px 0; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.3); max-width: 100%; width: 100%; min-width: 0; overflow: hidden; }
+        .code-header { background: var(--code-block-header); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--accent); font-family: monospace; border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+        .copy-code-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; text-transform: uppercase; }
         .copy-code-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+        .code-container pre { margin: 0; padding: 16px; overflow-x: auto; overflow-y: auto; max-width: 100%; max-height: 400px; -webkit-overflow-scrolling: touch; }
+        .code-container code { font-family: 'Courier New', Courier, monospace; font-size: 13px; background: none; padding: 0; white-space: pre; display: block; }
+        .ai-message :not(pre) > code { background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.85em; color: var(--accent); word-break: break-all; }
 
-        .code-container pre {
-            margin: 0;
-            padding: 16px;
-            /* ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ ТОЛЬКО ВНУТРИ БЛОКА КОДА */
-            overflow-x: auto;
-            overflow-y: hidden;
-            /* КРИТИЧНО — pre не расширяет родителя */
-            max-width: 100%;
-            -webkit-overflow-scrolling: touch;
-        }
+        .loading-dots span { animation: blink 1.4s infinite both; font-weight: bold; display: inline-block; font-size: 20px; color: var(--accent); }
+        .loading-dots span:nth-child(2) { animation-delay: .2s; } .loading-dots span:nth-child(3) { animation-delay: .4s; }
 
-        .code-container code {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            background: none;
-            padding: 0;
-            /* Код не переносится — скроллится горизонтально внутри pre */
-            white-space: pre;
-            display: block;
-        }
+        /* Input Area & Attachments */
+        .chat-input-area { padding: 15px 30px 25px 30px; background: linear-gradient(transparent, rgba(0,0,0,0.4) 30%); flex-shrink: 0; width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 10px;}
+        
+        .preview-container { display: none; padding: 10px 16px 0 16px; position: relative; width: fit-content; background: var(--msg-ai); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(10px);}
+        .preview-container img { max-height: 100px; border-radius: 8px; display: block; }
+        .remove-preview { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
 
-        .ai-message :not(pre) > code {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.85em;
-            color: var(--accent);
-            word-break: break-all;
-        }
+        .input-wrapper { display: flex; background-color: var(--msg-ai); border: 1px solid var(--border-color); border-radius: 16px; padding: 8px 12px; align-items: flex-end; transition: all 0.3s ease; backdrop-filter: blur(10px); width: 100%; min-width: 0; }
+        .input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        
+        .attach-btn { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 8px; transition: color 0.2s; display: flex; align-items: center; justify-content: center;}
+        .attach-btn:hover { color: var(--accent); }
+        
+        .input-wrapper textarea { flex-grow: 1; background: transparent; border: none; outline: none; color: var(--text-main); font-size: 15px; padding: 8px; resize: none; max-height: 180px; min-height: 24px; line-height: 1.4; min-width: 0; width: 100%; }
+        .input-wrapper button[type="submit"] { background: var(--accent); border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; flex-shrink: 0; box-shadow: 0 0 15px var(--accent-glow); margin-left: 8px;}
+        .input-wrapper button[type="submit"]:hover { transform: scale(1.05); }
+        .input-wrapper button[type="submit"] svg { width: 18px; height: 18px; fill: #000; }
 
-        .loading-dots span {
-            animation: blink 1.4s infinite both;
-            font-weight: bold;
-            display: inline-block;
-            font-size: 20px;
-            color: var(--accent);
-        }
-        .loading-dots span:nth-child(2) { animation-delay: .2s; }
-        .loading-dots span:nth-child(3) { animation-delay: .4s; }
-
-        .chat-input-area {
-            padding: 15px 30px 25px 30px; 
-            background: linear-gradient(transparent, rgba(0,0,0,0.4) 30%);
-            flex-shrink: 0; 
-            width: 100%;
-            min-width: 0;
-        }
-
-        .input-wrapper {
-            display: flex;
-            background-color: var(--msg-ai);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 12px 16px;
-            align-items: flex-end;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            width: 100%;
-            min-width: 0;
-        }
-
-        .input-wrapper:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .input-wrapper textarea {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-main);
-            font-size: 15px;
-            padding: 4px 8px;
-            resize: none;
-            max-height: 180px;
-            min-height: 24px;
-            line-height: 1.4;
-            /*Textarea не расширяет контейнер */
-            min-width: 0;
-            width: 100%;
-        }
-
-        .input-wrapper button {
-            background: var(--accent);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            flex-shrink: 0;
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-        .input-wrapper button:hover { 
-            transform: scale(1.05); 
-            box-shadow: 0 0 25px var(--accent-glow);
-        }
-        .input-wrapper button svg { width: 18px; height: 18px; fill: #000; }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
-
-        .settings-modal {
-            background-color: var(--modal-bg);
-            border: 1px solid var(--border-color);
-            width: 420px;
-            border-radius: 22px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow);
-            transform: scale(0.92);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-        }
+        .settings-modal { background-color: var(--modal-bg); border: 1px solid var(--border-color); width: 420px; border-radius: 22px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); transform: scale(0.92); transition: transform 0.3s; display: flex; flex-direction: column; gap: 22px; }
         .modal-overlay.open .settings-modal { transform: scale(1); }
-
         .modal-header { display: flex; justify-content: space-between; align-items: center; }
         .modal-header h4 { font-size: 20px; font-weight: 700; color: var(--accent); }
-        .close-modal-btn { background: transparent; border:none; color: var(--text-muted); font-size: 22px; cursor: pointer; transition: color 0.2s; }
-        .close-modal-btn:hover { color: var(--accent); }
-
+        .close-modal-btn { background: transparent; border:none; color: var(--text-muted); font-size: 22px; cursor: pointer; }
         .setting-group { display: flex; flex-direction: column; gap: 10px; }
         .setting-group label { font-size: 12px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
-        
-        .setting-group select {
-            width: 100%; padding: 12px;
-            background: var(--msg-ai);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            border-radius: 12px; outline: none; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .setting-group select:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-        .setting-group select option { background: var(--sidebar-bg); }
-
+        .setting-group select { width: 100%; padding: 12px; background: var(--msg-ai); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; outline: none; cursor: pointer; }
+        .setting-group select option { background: var(--sidebar-bg); color: #fff; }
         .settings-links { display: flex; flex-direction: column; gap: 12px; margin-top: 5px; }
-        .settings-link-btn {
-            width: 100%; padding: 13px;
-            background: var(--msg-ai);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            text-align: center; border-radius: 12px;
-            text-decoration: none; font-size: 13px; font-weight: 600;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .settings-link-btn:hover { 
-            border-color: var(--accent); 
-            background: var(--accent-glow); 
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        .modal-footer-status {
-            font-size: 11px; color: var(--text-muted);
-            text-align: center; border-top: 1px solid var(--border-color);
-            padding-top: 18px; margin-top: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .settings-link-btn { width: 100%; padding: 13px; background: var(--msg-ai); border: 1px solid var(--border-color); color: var(--text-main); text-align: center; border-radius: 12px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.3s; text-transform: uppercase; }
+        .settings-link-btn:hover { border-color: var(--accent); background: var(--accent-glow); }
+        .modal-footer-status { font-size: 11px; color: var(--text-muted); text-align: center; border-top: 1px solid var(--border-color); padding-top: 18px; text-transform: uppercase; }
         .status-online { color: #2ecc71; font-weight: 700; }
-
-        .sidebar-overlay {
-            display: none; position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); z-index: 90;
-        }
-
+        .sidebar-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); z-index: 90; }
         .menu-toggle-btn { display: none; }
 
-        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
         @media (max-width: 768px) {
-            .sidebar { 
-                position: absolute; 
-                top: 0; left: 0; bottom: 0; 
-                transform: translateX(-100%); 
-                width: 85%;
-                max-width: 300px;
-            }
-            .sidebar.open { transform: translateX(0); }
-            .sidebar.open + .sidebar-overlay { display: block; }
-            .menu-toggle-btn { display: block; }
-            
-            .chat-header { padding: 12px 15px; }
-            
-            .messages-container { 
-                padding: 15px 12px; 
-                gap: 14px;
-            }
-            
-            /* НА МОБИЛКЕ СООБЩЕНИЯ ПОЧТИ НА ВСЮ ШИРИНУ */
-            .message { 
-                max-width: 92%; 
-                font-size: 14px; 
-                padding: 12px 14px;
-            }
-
-            .ai-message {
-                max-width: 92%;
-            }
-
-            .user-message {
-                max-width: 92%;
-            }
-
-            /* БЛОК КОДА НА МОБИЛКЕ */
-            .code-container {
-                margin: 10px -4px;
-                border-radius: 10px;
-            }
-
-            .code-header {
-                padding: 8px 12px;
-                font-size: 11px;
-            }
-
-            .code-container pre {
-                padding: 12px;
-            }
-
-            .code-container code {
-                font-size: 12px;
-            }
-
-            .copy-code-btn {
-                padding: 5px 10px;
-                font-size: 11px;
-                /* Кнопка всегда видна и доступна для нажатия */
-                min-width: 60px;
-                text-align: center;
-            }
-
-            .chat-input-area { 
-                padding: 10px 12px 20px 12px; 
-            }
-
-            .input-wrapper {
-                padding: 10px 12px;
-                border-radius: 14px;
-            }
-
-            .input-wrapper textarea {
-                font-size: 16px; /* 16px предотвращает автозум на iOS */
-            }
-
-            .input-wrapper button {
-                width: 38px;
-                height: 38px;
-            }
-
-            .settings-modal { 
-                width: 92%; 
-                max-height: 85vh; 
-                padding: 22px; 
-                border-radius: 18px;
-            }
-
-            .model-info h3 { font-size: 14px; }
-            .model-info p { font-size: 11px; }
-        }
-
-        /* ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ */
-        @media (max-width: 380px) {
-            .message { max-width: 95%; padding: 10px 12px; font-size: 13px; }
-            .ai-message { max-width: 95%; }
-            .user-message { max-width: 95%; }
-            .messages-container { padding: 12px 8px; }
-            .chat-input-area { padding: 8px 8px 18px 8px; }
+            .sidebar { position: absolute; top: 0; left: 0; bottom: 0; transform: translateX(-100%); width: 85%; max-width: 300px; }
+            .sidebar.open { transform: translateX(0); } .sidebar.open + .sidebar-overlay { display: block; }
+            .menu-toggle-btn { display: block; } .chat-header { padding: 12px 15px; }
+            .messages-container { padding: 15px 12px; gap: 14px; }
+            .message { max-width: 92%; font-size: 14px; padding: 12px 14px; }
+            .ai-message, .user-message { max-width: 92%; }
+            .code-container pre { padding: 12px; max-height: 300px; }
+            .chat-input-area { padding: 10px 12px 20px 12px; }
+            .input-wrapper textarea { font-size: 16px; }
+            .settings-modal { width: 92%; max-height: 85vh; padding: 22px; }
         }
 
         @keyframes appFadeIn { to { opacity: 1; } }
@@ -768,21 +174,14 @@
 
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <span class="logo-icon">⚡</span>
-                <h2 id="logoText">MixQZero AI</h2>
-            </div>
+            <div class="logo"><span class="logo-icon">⚡</span><h2 id="logoText">MixQZero AI</h2></div>
             <button class="new-chat-btn" id="newChatBtnSide" onclick="startNewChat()">+ Новый чат</button>
             <div class="sidebar-content" id="chatsList"></div>
-            
             <div class="sidebar-footer">
-                <a href="https://t.me/mixqzeroai_bot" target="_blank" class="tg-bot-sidebar-btn" id="tgBotSidebarBtn">
-                    🧬 ИИ в телеграмме
-                </a>
+                <a href="https://t.me/mixqzeroai_bot" target="_blank" class="tg-bot-sidebar-btn" id="tgBotSidebarBtn">🧬 ИИ в телеграмме</a>
                 <button class="settings-btn-trigger" onclick="openModal()" id="settingsBtnLabel">⚙️ Настройки</button>
             </div>
         </aside>
-
         <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
         <main class="chat-container">
@@ -790,7 +189,7 @@
                 <div class="header-left">
                     <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
                     <div class="model-info">
-                        <h3>Gemini 3.5 Flash Lite</h3>
+                        <h3 id="headerModelName">Gemini 3.5 Flash Lite</h3>
                         <p id="serverTariffLabel">Обновленная быстрая бесплатная модель</p>
                     </div>
                 </div>
@@ -800,7 +199,17 @@
             <div class="messages-container" id="messagesContainer"></div>
 
             <footer class="chat-input-area">
+                <!-- Превью картинки -->
+                <div class="preview-container" id="previewContainer">
+                    <img id="imagePreview" src="" alt="Preview">
+                    <button class="remove-preview" onclick="removeAttachment()">✕</button>
+                </div>
+
                 <form id="chatForm" class="input-wrapper">
+                    <!-- Кнопка скрепка -->
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                    <button type="button" class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить фото">📎</button>
+                    
                     <textarea id="userInput" placeholder="Задайте вопрос..." rows="1" autocomplete="off" required></textarea>
                     <button type="submit" id="sendBtn">
                         <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"></path></svg>
@@ -810,12 +219,23 @@
         </main>
     </div>
 
+    <!-- МОДАЛ НАСТРОЕК -->
     <div class="modal-overlay" id="settingsModalOverlay" onclick="closeModal(event)">
         <div class="settings-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h4 id="modalTitle">Настройки</h4>
                 <button class="close-modal-btn" onclick="closeModal()">✕</button>
             </div>
+            
+            <!-- Выбор модели -->
+            <div class="setting-group">
+                <label id="modelLabel">Модель ИИ</label>
+                <select id="modelSelect" onchange="changeModel(this.value)">
+                    <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Быстрая)</option>
+                    <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (Старая)</option>
+                </select>
+            </div>
+
             <div class="setting-group">
                 <label id="themeLabel">Тема оформления</label>
                 <select id="themeSelect" onchange="changeTheme(this.value)">
@@ -849,6 +269,11 @@
         const sidebar = document.getElementById('sidebar');
         const chatsList = document.getElementById('chatsList');
         const modal = document.getElementById('settingsModalOverlay');
+        
+        // Элементы для фото
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
 
         const WORKER_URL = 'https://webai.mqz.workers.dev/'; 
 
@@ -856,39 +281,26 @@
         let currentChatId = null;
         const MAX_HISTORY = 16; 
         let currentLang = 'ru';
+        let currentModel = 'gemini-3.5-flash-lite';
+        
+        // Переменная для хранения прикрепленного фото в формате Base64
+        let pendingImageData = null; 
+        let pendingImageMime = null;
 
         const translations = {
             ru: {
-                placeholder: "Задайте вопрос...",
-                newChat: "+ Новый чат",
-                settings: "⚙️ Настройки",
-                modalTitle: "Настройки",
-                theme: "Тема оформления",
-                lang: "Язык интерфейса",
-                tg: "Телеграмм канал",
-                mainSite: "Основной сайт",
-                tariff: "Обновленная быстрая бесплатная модель",
-                greeting: "Привет! Я твой ИИ-помощник на базе Gemini 3.5 Flash Lite. Также я есть в телеграмме 👉 [t.me/mixqzeroai_bot](https://t.me/mixqzeroai_bot). Задавай любой вопрос!",
-                errorNet: "❌ Ошибка сети. Проверь статус Воркера и настройки его переменных.",
-                loading: "Секунду",
-                copied: "Скопировано!",
-                tgSidebarBtn: "🧬 ИИ в телеграмме"
+                placeholder: "Задайте вопрос...", newChat: "+ Новый чат", settings: "⚙️ Настройки",
+                modalTitle: "Настройки", theme: "Тема оформления", lang: "Язык интерфейса", model: "Модель ИИ",
+                tg: "Телеграмм канал", mainSite: "Основной сайт", tariff: "Мультимодальная модель (текст + фото)",
+                greeting: "Привет! Я твой ИИ-помощник. Я понимаю текст и могу анализировать картинки 📎. Задавай любой вопрос!",
+                errorNet: "❌ Ошибка сети. Проверь статус Воркера.", loading: "Секунду", copied: "Скопировано!", tgSidebarBtn: "🧬 ИИ в телеграмме"
             },
             en: {
-                placeholder: "Ask a question...",
-                newChat: "+ New Chat",
-                settings: "⚙️ Settings",
-                modalTitle: "Settings",
-                theme: "Theme",
-                lang: "Language",
-                tg: "Telegram Channel",
-                mainSite: "Main Website",
-                tariff: "Updated fast free model",
-                greeting: "Hello! I am your AI assistant powered by Gemini 3.5 Flash Lite. I am also available on Telegram 👉 [t.me/mixqzeroai_bot](https://t.me/mixqzeroai_bot). Ask me anything!",
-                errorNet: "❌ Network error. Check your Worker status and environment variables.",
-                loading: "Hold on",
-                copied: "Copied!",
-                tgSidebarBtn: "🧬 AI in Telegram"
+                placeholder: "Ask a question...", newChat: "+ New Chat", settings: "⚙️ Settings",
+                modalTitle: "Settings", theme: "Theme", lang: "Language", model: "AI Model",
+                tg: "Telegram Channel", mainSite: "Main Website", tariff: "Multimodal model (text + images)",
+                greeting: "Hello! I am your AI assistant. I understand text and can analyze images 📎. Ask me anything!",
+                errorNet: "❌ Network error. Check Worker status.", loading: "Hold on", copied: "Copied!", tgSidebarBtn: "🧬 AI in Telegram"
             }
         };
 
@@ -896,15 +308,7 @@
             code(code, infostring) {
                 const lang = infostring || 'text';
                 const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                return `
-                    <div class="code-container">
-                        <div class="code-header">
-                            <span>${lang}</span>
-                            <button class="copy-code-btn" onclick="copyCodeText(this)">Copy</button>
-                        </div>
-                        <pre><code class="hljs language-${lang}">${escapedCode}</code></pre>
-                    </div>
-                `;
+                return `<div class="code-container"><div class="code-header"><span>${lang}</span><button class="copy-code-btn" onclick="copyCodeText(this)">Copy</button></div><pre><code class="hljs language-${lang}">${escapedCode}</code></pre></div>`;
             }
         };
         marked.use({ renderer });
@@ -914,24 +318,26 @@
             const savedCurrentId = localStorage.getItem('mixqzero_current_chat_id');
             if (savedAllChats) allChats = JSON.parse(savedAllChats);
             
-            if (savedCurrentId && allChats[savedCurrentId]) {
-                currentChatId = savedCurrentId;
-            } else {
+            if (savedCurrentId && allChats[savedCurrentId]) currentChatId = savedCurrentId;
+            else {
                 currentChatId = 'chat_' + Date.now();
                 allChats[currentChatId] = { title: currentLang === 'ru' ? 'Новый чат' : 'New Chat', history: [] };
                 saveToLocalStorage();
             }
             
-            renderMessages();
-            renderSidebarChats();
+            renderMessages(); renderSidebarChats();
 
             const savedTheme = localStorage.getItem('mixqzero_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.getElementById('themeSelect').value = savedTheme;
 
             const savedLang = localStorage.getItem('mixqzero_lang') || 'ru';
-            currentLang = savedLang;
-            document.getElementById('langSelect').value = savedLang;
+            currentLang = savedLang; document.getElementById('langSelect').value = savedLang;
+
+            const savedModel = localStorage.getItem('mixqzero_model') || 'gemini-3.5-flash-lite';
+            currentModel = savedModel; document.getElementById('modelSelect').value = savedModel;
+            updateHeaderModel();
+
             applyLanguage();
         });
 
@@ -942,26 +348,63 @@
         });
 
         userInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                chatForm.requestSubmit();
-            }
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatForm.requestSubmit(); }
         });
 
+        // --- ЛОГИКА ФОТО ---
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите изображение.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Full = e.target.result;
+                // Показываем превью
+                imagePreview.src = base64Full;
+                previewContainer.style.display = 'block';
+                
+                // Сохраняем данные для отправки (убираем префикс data:image...;base64,)
+                pendingImageMime = file.type;
+                pendingImageData = base64Full.split(',')[1];
+                
+                // Фокус на поле ввода
+                userInput.focus();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeAttachment() {
+            fileInput.value = '';
+            pendingImageData = null;
+            pendingImageMime = null;
+            previewContainer.style.display = 'none';
+            imagePreview.src = '';
+        }
+
+        // --- ОСТАЛЬНАЯ ЛОГИКА ---
         function toggleSidebar() { sidebar.classList.toggle('open'); }
         function openModal() { modal.classList.add('open'); }
         function closeModal() { modal.classList.remove('open'); }
 
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('mixqzero_theme', theme);
+        function changeTheme(theme) { document.documentElement.setAttribute('data-theme', theme); localStorage.setItem('mixqzero_theme', theme); }
+        
+        function changeModel(model) { 
+            currentModel = model; 
+            localStorage.setItem('mixqzero_model', model); 
+            updateHeaderModel();
         }
 
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('mixqzero_lang', lang);
-            applyLanguage();
+        function updateHeaderModel() {
+            const modelName = currentModel === 'gemini-3.5-flash-lite' ? 'Gemini 3.5 Flash Lite' : 'Gemini 3.1 Flash Lite';
+            document.getElementById('headerModelName').textContent = modelName;
         }
+
+        function changeLanguage(lang) { currentLang = lang; localStorage.setItem('mixqzero_lang', lang); applyLanguage(); }
 
         function applyLanguage() {
             const t = translations[currentLang];
@@ -971,54 +414,35 @@
             document.getElementById('modalTitle').textContent = t.modalTitle;
             document.getElementById('themeLabel').textContent = t.theme;
             document.getElementById('langLabel').textContent = t.lang;
+            document.getElementById('modelLabel').textContent = t.model;
             document.getElementById('linkTg').textContent = t.tg;
             document.getElementById('linkMain').textContent = t.mainSite;
             document.getElementById('serverTariffLabel').textContent = t.tariff;
             document.getElementById('tgBotSidebarBtn').textContent = t.tgSidebarBtn;
             
             if (allChats[currentChatId] && allChats[currentChatId].history.length === 0) {
-                messagesContainer.innerHTML = '';
-                appendMessage(t.greeting, 'ai-message', false);
+                messagesContainer.innerHTML = ''; appendMessage(t.greeting, 'ai-message', false);
             }
         }
 
         function startNewChat() {
             currentChatId = 'chat_' + Date.now();
             allChats[currentChatId] = { title: currentLang === 'ru' ? 'Новый чат' : 'New Chat', history: [] };
-            saveToLocalStorage();
-            renderMessages();
-            renderSidebarChats();
+            saveToLocalStorage(); renderMessages(); renderSidebarChats(); removeAttachment();
             if (sidebar.classList.contains('open')) toggleSidebar();
         }
 
         function renderSidebarChats() {
             chatsList.innerHTML = '';
             const sortedIds = Object.keys(allChats).sort((a, b) => b.split('_')[1] - a.split('_')[1]);
-            
             sortedIds.forEach(id => {
                 const item = document.createElement('div');
                 item.classList.add('chat-history-item');
                 if (id === currentChatId) item.classList.add('active');
-                
-                const titleSpan = document.createElement('span');
-                titleSpan.textContent = allChats[id].title;
-                titleSpan.style.overflow = 'hidden';
-                titleSpan.style.textOverflow = 'ellipsis';
-                item.appendChild(titleSpan);
-                
-                const delBtn = document.createElement('button');
-                delBtn.classList.add('delete-chat-btn');
-                delBtn.innerHTML = '✕';
-                delBtn.onclick = (e) => { e.stopPropagation(); deleteChat(id); };
-                item.appendChild(delBtn);
-
-                item.onclick = () => {
-                    currentChatId = id;
-                    localStorage.setItem('mixqzero_current_chat_id', currentChatId);
-                    renderMessages();
-                    renderSidebarChats();
-                    if (window.innerWidth <= 768) toggleSidebar();
-                };
+                const titleSpan = document.createElement('span'); titleSpan.textContent = allChats[id].title; item.appendChild(titleSpan);
+                const delBtn = document.createElement('button'); delBtn.classList.add('delete-chat-btn'); delBtn.innerHTML = '✕';
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteChat(id); }; item.appendChild(delBtn);
+                item.onclick = () => { currentChatId = id; localStorage.setItem('mixqzero_current_chat_id', currentChatId); renderMessages(); renderSidebarChats(); removeAttachment(); if (window.innerWidth <= 768) toggleSidebar(); };
                 chatsList.appendChild(item);
             });
         }
@@ -1026,127 +450,151 @@
         function renderMessages() {
             messagesContainer.innerHTML = '';
             if (!allChats[currentChatId]) return;
-            
             const history = allChats[currentChatId].history;
-            if (history.length === 0) {
-                appendMessage(translations[currentLang].greeting, 'ai-message', false);
-            } else {
+            if (history.length === 0) appendMessage(translations[currentLang].greeting, 'ai-message', false);
+            else {
                 history.forEach(msg => {
                     const className = msg.role === 'user' ? 'user-message' : 'ai-message';
-                    appendMessage(msg.parts[0].text, className, false);
+                    // Если в истории есть картинка, рендерим её
+                    let imgHtml = '';
+                    if (msg.parts && msg.parts.length > 1 && msg.parts[1].inline_data) {
+                        imgHtml = `<img src="data:${msg.parts[1].inline_data.mime_type};base64,${msg.parts[1].inline_data.data}" class="msg-image" onclick="window.open(this.src)">`;
+                    }
+                    appendMessage(msg.parts[0].text, className, false, imgHtml);
                 });
             }
         }
 
         function deleteChat(id) {
-            delete allChats[id];
-            saveToLocalStorage();
+            delete allChats[id]; saveToLocalStorage();
             if (currentChatId === id) {
                 const keys = Object.keys(allChats);
-                if (keys.length > 0) currentChatId = keys[keys.length - 1];
-                else { startNewChat(); return; }
+                if (keys.length > 0) currentChatId = keys[keys.length - 1]; else { startNewChat(); return; }
             }
-            renderMessages();
-            renderSidebarChats();
+            renderMessages(); renderSidebarChats();
         }
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = userInput.value.trim();
-            if (!text) return;
+            
+            // Разрешаем отправку, если есть текст ИЛИ картинка
+            if (!text && !pendingImageData) return;
 
-            userInput.value = '';
-            userInput.style.height = '24px';
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-
-            if (allChats[currentChatId].history.length === 0) {
-                allChats[currentChatId].title = text.length > 22 ? text.substring(0, 20) + '...' : text;
-                renderSidebarChats();
+            // Формируем parts для Google API
+            let userParts = [];
+            if (text) userParts.push({ text: text });
+            
+            // Сохраняем данные для отображения в UI
+            let displayImgHtml = '';
+            
+            if (pendingImageData) {
+                userParts.push({
+                    inline_data: { mime_type: pendingImageMime, data: pendingImageData }
+                });
+                displayImgHtml = `<img src="data:${pendingImageMime};base64,${pendingImageData}" class="msg-image" onclick="window.open(this.src)">`;
             }
 
-            appendMessage(text, 'user-message', false);
-            allChats[currentChatId].history.push({ role: 'user', parts: [{ text: text }] });
+            // Очищаем UI
+            userInput.value = ''; userInput.style.height = '24px';
+            userInput.disabled = true; sendBtn.disabled = true;
+            const tempImgData = pendingImageData; // сохраняем ссылку до очистки
+            removeAttachment();
+
+            if (allChats[currentChatId].history.length === 0 && text) {
+                allChats[currentChatId].title = text.length > 22 ? text.substring(0, 20) + '...' : text;
+                renderSidebarChats();
+            } else if (allChats[currentChatId].history.length === 0 && !text) {
+                allChats[currentChatId].title = '📷 Фото'; renderSidebarChats();
+            }
+
+            // Добавляем в историю и рендерим
+            allChats[currentChatId].history.push({ role: 'user', parts: userParts });
             saveToLocalStorage();
+            appendMessage(text || (currentLang==='ru'?'[Фото]':'[Image]'), 'user-message', false, displayImgHtml);
 
             const loadingElement = appendMessage(`<div class="loading-dots">${translations[currentLang].loading}<span>.</span><span>.</span><span>.</span></div>`, 'ai-message', false);
 
             try {
                 let historyToSend = allChats[currentChatId].history;
-                if (historyToSend.length > MAX_HISTORY) {
-                    historyToSend = historyToSend.slice(-MAX_HISTORY);
-                }
+                if (historyToSend.length > MAX_HISTORY) historyToSend = historyToSend.slice(-MAX_HISTORY);
 
+                // Отправляем на воркер, передавая выбранную модель
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ history: historyToSend })
+                    body: JSON.stringify({ history: historyToSend, model: currentModel })
                 });
 
                 const data = await response.json();
                 loadingElement.remove();
 
                 if (response.ok && data.reply) {
-                    const aiReply = data.reply;
-                    allChats[currentChatId].history.push({ role: 'model', parts: [{ text: aiReply }] });
-                    saveToLocalStorage();
-                    appendMessage(aiReply, 'ai-message', true);
+                    allChats[currentChatId].history.push({ role: 'model', parts: [{ text: data.reply }] });
+                    saveToLocalStorage(); appendMessage(data.reply, 'ai-message', true);
                 } else {
-                    appendMessage(`❌ Error: ${data.error || 'Failed to get answer'}`, 'ai-message', false);
+                    appendMessage(`❌ Error: ${data.error || 'Failed'}`, 'ai-message', false);
                 }
-
             } catch (error) {
-                console.error(error);
-                if (loadingElement) loadingElement.remove();
+                console.error(error); if (loadingElement) loadingElement.remove();
                 appendMessage(translations[currentLang].errorNet, 'ai-message', false);
             } finally {
-                userInput.disabled = false;
-                sendBtn.disabled = false;
-                userInput.focus();
+                userInput.disabled = false; sendBtn.disabled = false; userInput.focus();
             }
         });
 
-        function appendMessage(content, className, isAiReply = false) {
+        // Обновленная функция рендера, принимающая HTML картинки
+        function appendMessage(content, className, isAiReply = false, imageHtml = '') {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', className);
             messagesContainer.appendChild(messageDiv);
             
             if (className === 'ai-message') {
                 messageDiv.innerHTML = marked.parse(content);
-                messageDiv.querySelectorAll('pre code').forEach((el) => {
-                    hljs.highlightElement(el);
-                });
+                messageDiv.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
             } else {
-                messageDiv.textContent = content;
+                // Для пользователя сначала картинка (если есть), потом текст
+                messageDiv.innerHTML = imageHtml;
+                if (content && content !== '[Фото]' && content !== '[Image]') {
+                    const textNode = document.createElement('div');
+                    textNode.textContent = content;
+                    messageDiv.appendChild(textNode);
+                }
             }
-            
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             return messageDiv;
         }
 
         function copyCodeText(button) {
             const codeContainer = button.closest('.code-container');
-            const codeElement = codeContainer.querySelector('code');
-            const textToCopy = codeElement.innerText;
-
+            const textToCopy = codeContainer.querySelector('code').innerText;
             navigator.clipboard.writeText(textToCopy).then(() => {
-                const originalText = button.textContent;
-                button.textContent = translations[currentLang].copied;
-                button.style.background = '#2ecc71';
-                button.style.borderColor = '#2ecc71';
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = '';
-                    button.style.borderColor = '';
-                }, 2000);
-            }).catch(err => {
-                console.error('Ошибка копирования: ', err);
+                const originalText = button.textContent; button.textContent = translations[currentLang].copied;
+                button.style.background = '#2ecc71'; button.style.borderColor = '#2ecc71';
+                setTimeout(() => { button.textContent = originalText; button.style.background = ''; button.style.borderColor = ''; }, 2000);
             });
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('mixqzero_all_chats', JSON.stringify(allChats));
-            localStorage.setItem('mixqzero_current_chat_id', currentChatId);
+            // ВАЖНО: Картинки в Base64 весят много. LocalStorage имеет лимит ~5MB.
+            // Если юзер прикрепит много тяжелых фоток, localStorage переполнится.
+            // Для production лучше хранить только текст, а картинки удалять из истории перед сохранением,
+            // но для теста оставим как есть.
+            try {
+                localStorage.setItem('mixqzero_all_chats', JSON.stringify(allChats));
+                localStorage.setItem('mixqzero_current_chat_id', currentChatId);
+            } catch (e) {
+                console.warn("LocalStorage quota exceeded. Cleaning old image data.");
+                // Простая очистка: удаляем base64 из старых сообщений если переполнилось
+                for(let chat in allChats) {
+                    allChats[chat].history.forEach(msg => {
+                        if(msg.parts && msg.parts[1] && msg.parts[1].inline_data) {
+                            msg.parts[1].inline_data.data = "CLEARED_TO_SAVE_SPACE";
+                        }
+                    });
+                }
+                localStorage.setItem('mixqzero_all_chats', JSON.stringify(allChats));
+            }
         }
     </script>
 </body>
