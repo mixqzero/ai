@@ -93,7 +93,6 @@
         .user-message { background-color: var(--msg-user); color: var(--text-main); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 20px var(--accent-glow); white-space: pre-wrap; border-color: var(--accent); display: flex; flex-direction: column; gap: 10px;}
         .ai-message { background-color: var(--msg-ai); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; backdrop-filter: blur(5px); max-width: 80%; min-width: 0; }
         
-        /* Стили для прикрепленного фото в сообщении пользователя */
         .msg-image { max-width: 100%; max-height: 300px; border-radius: 12px; object-fit: contain; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
 
         .ai-message a { color: var(--accent); text-decoration: none; font-weight: 600; border-bottom: 1px dashed var(--accent); word-break: break-all; }
@@ -103,6 +102,15 @@
         [data-theme="light"] .ai-message strong { color: var(--accent); }
         .ai-message ul, .ai-message ol { margin-left: 20px; margin-bottom: 10px; }
         
+        /* Стили для источников из интернета */
+        .search-sources { margin-top: 15px; padding-top: 12px; border-top: 1px dashed var(--border-color); font-size: 13px; }
+        .search-sources-title { color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px;}
+        .sources-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+        .source-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .source-item:hover { background: var(--accent-glow); border-color: var(--accent); }
+        .source-item a { color: var(--text-main); text-decoration: none; border: none; font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+        .source-item a:hover { color: var(--accent); text-shadow: none; }
+
         .code-container { margin: 12px 0; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.3); max-width: 100%; width: 100%; min-width: 0; overflow: hidden; }
         .code-header { background: var(--code-block-header); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--accent); font-family: monospace; border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
         .copy-code-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; text-transform: uppercase; }
@@ -124,8 +132,21 @@
         .input-wrapper { display: flex; background-color: var(--msg-ai); border: 1px solid var(--border-color); border-radius: 16px; padding: 8px 12px; align-items: flex-end; transition: all 0.3s ease; backdrop-filter: blur(10px); width: 100%; min-width: 0; }
         .input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
         
-        .attach-btn { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 8px; transition: color 0.2s; display: flex; align-items: center; justify-content: center;}
-        .attach-btn:hover { color: var(--accent); }
+        /* Новая иконка скрепки (квадрат) */
+        .attach-btn { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--border-color); 
+            color: var(--text-main); 
+            width: 40px; height: 40px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            margin-right: 8px;
+        }
+        .attach-btn:hover { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+        .attach-btn svg { width: 20px; height: 20px; fill: currentColor; }
         
         .input-wrapper textarea { flex-grow: 1; background: transparent; border: none; outline: none; color: var(--text-main); font-size: 15px; padding: 8px; resize: none; max-height: 180px; min-height: 24px; line-height: 1.4; min-width: 0; width: 100%; }
         .input-wrapper button[type="submit"] { background: var(--accent); border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; flex-shrink: 0; box-shadow: 0 0 15px var(--accent-glow); margin-left: 8px;}
@@ -190,7 +211,7 @@
                     <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
                     <div class="model-info">
                         <h3 id="headerModelName">Gemini 3.5 Flash Lite</h3>
-                        <p id="serverTariffLabel">Обновленная быстрая бесплатная модель</p>
+                        <p id="serverTariffLabel">Бесплатный тариф (текст, фото, поиск в интернете)</p>
                     </div>
                 </div>
                 <button class="header-add-btn" onclick="startNewChat()" title="Новый чат">+</button>
@@ -199,16 +220,18 @@
             <div class="messages-container" id="messagesContainer"></div>
 
             <footer class="chat-input-area">
-                <!-- Превью картинки -->
                 <div class="preview-container" id="previewContainer">
                     <img id="imagePreview" src="" alt="Preview">
                     <button class="remove-preview" onclick="removeAttachment()">✕</button>
                 </div>
 
                 <form id="chatForm" class="input-wrapper">
-                    <!-- Кнопка скрепка -->
                     <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
-                    <button type="button" class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить фото">📎</button>
+                    
+                    <!-- Кнопка скрепка (квадрат с иконкой) -->
+                    <button type="button" class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить фото">
+                        <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+                    </button>
                     
                     <textarea id="userInput" placeholder="Задайте вопрос..." rows="1" autocomplete="off" required></textarea>
                     <button type="submit" id="sendBtn">
@@ -219,7 +242,6 @@
         </main>
     </div>
 
-    <!-- МОДАЛ НАСТРОЕК -->
     <div class="modal-overlay" id="settingsModalOverlay" onclick="closeModal(event)">
         <div class="settings-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -227,7 +249,6 @@
                 <button class="close-modal-btn" onclick="closeModal()">✕</button>
             </div>
             
-            <!-- Выбор модели -->
             <div class="setting-group">
                 <label id="modelLabel">Модель ИИ</label>
                 <select id="modelSelect" onchange="changeModel(this.value)">
@@ -253,7 +274,7 @@
             </div>
             <div class="settings-links">
                 <a href="https://t.me/mixqzero" target="_blank" class="settings-link-btn" id="linkTg">Телеграмм канал</a>
-                <a href="https://mixqzero.github.io/main" target="_blank" class="settings-link-btn" id="linkMain">Основной сайт</a>
+                <a href="https://mixqzero.github.io" target="_blank" class="settings-link-btn" id="linkMain">Основной сайт</a>
             </div>
             <div class="modal-footer-status">
                 <span id="statusLabel">Status:</span> <span class="status-online">Online</span>
@@ -270,7 +291,6 @@
         const chatsList = document.getElementById('chatsList');
         const modal = document.getElementById('settingsModalOverlay');
         
-        // Элементы для фото
         const fileInput = document.getElementById('fileInput');
         const previewContainer = document.getElementById('previewContainer');
         const imagePreview = document.getElementById('imagePreview');
@@ -283,7 +303,6 @@
         let currentLang = 'ru';
         let currentModel = 'gemini-3.5-flash-lite';
         
-        // Переменная для хранения прикрепленного фото в формате Base64
         let pendingImageData = null; 
         let pendingImageMime = null;
 
@@ -291,16 +310,18 @@
             ru: {
                 placeholder: "Задайте вопрос...", newChat: "+ Новый чат", settings: "⚙️ Настройки",
                 modalTitle: "Настройки", theme: "Тема оформления", lang: "Язык интерфейса", model: "Модель ИИ",
-                tg: "Телеграмм канал", mainSite: "Основной сайт", tariff: "Мультимодальная модель (текст + фото)",
-                greeting: "Привет! Я твой ИИ-помощник. Я понимаю текст и могу анализировать картинки 📎. Задавай любой вопрос!",
-                errorNet: "❌ Ошибка сети. Проверь статус Воркера.", loading: "Секунду", copied: "Скопировано!", tgSidebarBtn: "🧬 ИИ в телеграмме"
+                tg: "Телеграмм канал", mainSite: "Основной сайт", tariff: "Бесплатный тариф (текст, фото, поиск в интернете)",
+                greeting: "Добро пожаловать на MixQZero AI! Задайте свой интересующий вопрос, а также вы можете прикрепить изображение или узнать актуальную информацию с помощью поиска в интернете. Также мы есть в телеграмме t.me/mixqzeroai_bot.",
+                errorNet: "❌ Ошибка сети. Проверь статус Воркера.", loading: "Секунду", copied: "Скопировано!", tgSidebarBtn: "🧬 ИИ в телеграмме",
+                sources: "Источники из сети"
             },
             en: {
                 placeholder: "Ask a question...", newChat: "+ New Chat", settings: "⚙️ Settings",
                 modalTitle: "Settings", theme: "Theme", lang: "Language", model: "AI Model",
-                tg: "Telegram Channel", mainSite: "Main Website", tariff: "Multimodal model (text + images)",
-                greeting: "Hello! I am your AI assistant. I understand text and can analyze images 📎. Ask me anything!",
-                errorNet: "❌ Network error. Check Worker status.", loading: "Hold on", copied: "Copied!", tgSidebarBtn: "🧬 AI in Telegram"
+                tg: "Telegram Channel", mainSite: "Main Website", tariff: "Free plan (text, images, web search)",
+                greeting: "Welcome to MixQZero AI! Ask your question, attach an image, or get up-to-date info via web search. We are also on Telegram t.me/mixqzeroai_bot.",
+                errorNet: "❌ Network error. Check Worker status.", loading: "Hold on", copied: "Copied!", tgSidebarBtn: "🧬 AI in Telegram",
+                sources: "Web Sources"
             }
         };
 
@@ -351,42 +372,28 @@
             if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatForm.requestSubmit(); }
         });
 
-        // --- ЛОГИКА ФОТО ---
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            if (!file.type.startsWith('image/')) {
-                alert('Пожалуйста, выберите изображение.');
-                return;
-            }
+            if (!file.type.startsWith('image/')) return alert('Пожалуйста, выберите изображение.');
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64Full = e.target.result;
-                // Показываем превью
                 imagePreview.src = base64Full;
                 previewContainer.style.display = 'block';
-                
-                // Сохраняем данные для отправки (убираем префикс data:image...;base64,)
                 pendingImageMime = file.type;
                 pendingImageData = base64Full.split(',')[1];
-                
-                // Фокус на поле ввода
                 userInput.focus();
             };
             reader.readAsDataURL(file);
         }
 
         function removeAttachment() {
-            fileInput.value = '';
-            pendingImageData = null;
-            pendingImageMime = null;
-            previewContainer.style.display = 'none';
-            imagePreview.src = '';
+            fileInput.value = ''; pendingImageData = null; pendingImageMime = null;
+            previewContainer.style.display = 'none'; imagePreview.src = '';
         }
 
-        // --- ОСТАЛЬНАЯ ЛОГИКА ---
         function toggleSidebar() { sidebar.classList.toggle('open'); }
         function openModal() { modal.classList.add('open'); }
         function closeModal() { modal.classList.remove('open'); }
@@ -394,14 +401,11 @@
         function changeTheme(theme) { document.documentElement.setAttribute('data-theme', theme); localStorage.setItem('mixqzero_theme', theme); }
         
         function changeModel(model) { 
-            currentModel = model; 
-            localStorage.setItem('mixqzero_model', model); 
-            updateHeaderModel();
+            currentModel = model; localStorage.setItem('mixqzero_model', model); updateHeaderModel();
         }
 
         function updateHeaderModel() {
-            const modelName = currentModel === 'gemini-3.5-flash-lite' ? 'Gemini 3.5 Flash Lite' : 'Gemini 3.1 Flash Lite';
-            document.getElementById('headerModelName').textContent = modelName;
+            document.getElementById('headerModelName').textContent = currentModel === 'gemini-3.5-flash-lite' ? 'Gemini 3.5 Flash Lite' : 'Gemini 3.1 Flash Lite';
         }
 
         function changeLanguage(lang) { currentLang = lang; localStorage.setItem('mixqzero_lang', lang); applyLanguage(); }
@@ -455,12 +459,16 @@
             else {
                 history.forEach(msg => {
                     const className = msg.role === 'user' ? 'user-message' : 'ai-message';
-                    // Если в истории есть картинка, рендерим её
                     let imgHtml = '';
                     if (msg.parts && msg.parts.length > 1 && msg.parts[1].inline_data) {
                         imgHtml = `<img src="data:${msg.parts[1].inline_data.mime_type};base64,${msg.parts[1].inline_data.data}" class="msg-image" onclick="window.open(this.src)">`;
                     }
-                    appendMessage(msg.parts[0].text, className, false, imgHtml);
+                    // Рендерим текст и источники (если это ответ ИИ)
+                    let sourcesHtml = '';
+                    if (msg.role === 'model' && msg.sources && msg.sources.length > 0) {
+                        sourcesHtml = generateSourcesHtml(msg.sources);
+                    }
+                    appendMessage(msg.parts[0].text, className, false, imgHtml, sourcesHtml);
                 });
             }
         }
@@ -477,38 +485,26 @@
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = userInput.value.trim();
-            
-            // Разрешаем отправку, если есть текст ИЛИ картинка
             if (!text && !pendingImageData) return;
 
-            // Формируем parts для Google API
             let userParts = [];
             if (text) userParts.push({ text: text });
             
-            // Сохраняем данные для отображения в UI
             let displayImgHtml = '';
-            
             if (pendingImageData) {
-                userParts.push({
-                    inline_data: { mime_type: pendingImageMime, data: pendingImageData }
-                });
+                userParts.push({ inline_data: { mime_type: pendingImageMime, data: pendingImageData } });
                 displayImgHtml = `<img src="data:${pendingImageMime};base64,${pendingImageData}" class="msg-image" onclick="window.open(this.src)">`;
             }
 
-            // Очищаем UI
             userInput.value = ''; userInput.style.height = '24px';
             userInput.disabled = true; sendBtn.disabled = true;
-            const tempImgData = pendingImageData; // сохраняем ссылку до очистки
             removeAttachment();
 
-            if (allChats[currentChatId].history.length === 0 && text) {
-                allChats[currentChatId].title = text.length > 22 ? text.substring(0, 20) + '...' : text;
+            if (allChats[currentChatId].history.length === 0) {
+                allChats[currentChatId].title = text ? (text.length > 22 ? text.substring(0, 20) + '...' : text) : '📷 Фото';
                 renderSidebarChats();
-            } else if (allChats[currentChatId].history.length === 0 && !text) {
-                allChats[currentChatId].title = '📷 Фото'; renderSidebarChats();
             }
 
-            // Добавляем в историю и рендерим
             allChats[currentChatId].history.push({ role: 'user', parts: userParts });
             saveToLocalStorage();
             appendMessage(text || (currentLang==='ru'?'[Фото]':'[Image]'), 'user-message', false, displayImgHtml);
@@ -516,10 +512,9 @@
             const loadingElement = appendMessage(`<div class="loading-dots">${translations[currentLang].loading}<span>.</span><span>.</span><span>.</span></div>`, 'ai-message', false);
 
             try {
-                let historyToSend = allChats[currentChatId].history;
+                let historyToSend = allChats[currentChatId].history.map(msg => ({ role: msg.role, parts: msg.parts }));
                 if (historyToSend.length > MAX_HISTORY) historyToSend = historyToSend.slice(-MAX_HISTORY);
 
-                // Отправляем на воркер, передавая выбранную модель
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -530,8 +525,17 @@
                 loadingElement.remove();
 
                 if (response.ok && data.reply) {
-                    allChats[currentChatId].history.push({ role: 'model', parts: [{ text: data.reply }] });
-                    saveToLocalStorage(); appendMessage(data.reply, 'ai-message', true);
+                    // Сохраняем ответ и источники (если есть)
+                    let msgToSave = { role: 'model', parts: [{ text: data.reply }] };
+                    if (data.sources && data.sources.length > 0) {
+                        msgToSave.sources = data.sources;
+                    }
+                    
+                    allChats[currentChatId].history.push(msgToSave);
+                    saveToLocalStorage(); 
+                    
+                    let sourcesHtml = data.sources ? generateSourcesHtml(data.sources) : '';
+                    appendMessage(data.reply, 'ai-message', true, '', sourcesHtml);
                 } else {
                     appendMessage(`❌ Error: ${data.error || 'Failed'}`, 'ai-message', false);
                 }
@@ -543,17 +547,26 @@
             }
         });
 
-        // Обновленная функция рендера, принимающая HTML картинки
-        function appendMessage(content, className, isAiReply = false, imageHtml = '') {
+        function generateSourcesHtml(sources) {
+            if (!sources || sources.length === 0) return '';
+            let html = `<div class="search-sources"><div class="search-sources-title">🌐 ${translations[currentLang].sources}</div><div class="sources-list">`;
+            sources.forEach((src, index) => {
+                let title = src.title || new URL(src.uri).hostname;
+                html += `<div class="source-item"><span style="color:var(--accent);font-size:10px;">[${index+1}]</span><a href="${src.uri}" target="_blank" title="${title}">${title}</a></div>`;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+
+        function appendMessage(content, className, isAiReply = false, imageHtml = '', sourcesHtml = '') {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', className);
             messagesContainer.appendChild(messageDiv);
             
             if (className === 'ai-message') {
-                messageDiv.innerHTML = marked.parse(content);
+                messageDiv.innerHTML = marked.parse(content) + sourcesHtml;
                 messageDiv.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
             } else {
-                // Для пользователя сначала картинка (если есть), потом текст
                 messageDiv.innerHTML = imageHtml;
                 if (content && content !== '[Фото]' && content !== '[Image]') {
                     const textNode = document.createElement('div');
@@ -576,16 +589,11 @@
         }
 
         function saveToLocalStorage() {
-            // ВАЖНО: Картинки в Base64 весят много. LocalStorage имеет лимит ~5MB.
-            // Если юзер прикрепит много тяжелых фоток, localStorage переполнится.
-            // Для production лучше хранить только текст, а картинки удалять из истории перед сохранением,
-            // но для теста оставим как есть.
             try {
                 localStorage.setItem('mixqzero_all_chats', JSON.stringify(allChats));
                 localStorage.setItem('mixqzero_current_chat_id', currentChatId);
             } catch (e) {
                 console.warn("LocalStorage quota exceeded. Cleaning old image data.");
-                // Простая очистка: удаляем base64 из старых сообщений если переполнилось
                 for(let chat in allChats) {
                     allChats[chat].history.forEach(msg => {
                         if(msg.parts && msg.parts[1] && msg.parts[1].inline_data) {
